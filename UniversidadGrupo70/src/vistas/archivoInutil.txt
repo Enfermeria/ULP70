@@ -1,1 +1,0 @@
-Este es un archivo inútil cuyo único propósito es que se suba el paquete Vistas al repositorio.
