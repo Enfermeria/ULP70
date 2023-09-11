@@ -134,7 +134,11 @@ public class Login extends javax.swing.JFrame {
             int dni = Integer.parseInt(new String(jPassword.getPassword()));
             
             if (apellido.equalsIgnoreCase("ULP")&& nombre.equalsIgnoreCase("admin")&& dni == 12345) {
-                System.out.println("Acceso a Gestion de Alumnos");
+               // System.out.println("Acceso a Gestion de Alumnos");
+                PantallaPpal pantallaPpal = new PantallaPpal(); //creo una pantallaPpal
+		pantallaPpal.setVisible(true); // lo hago visible
+		pantallaPpal.setLocationRelativeTo(null); // abrirlo en el centro	
+                
             }else {
                 System.out.println("Acceso de alumnos");
             }
