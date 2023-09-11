@@ -44,7 +44,6 @@ public class PantallaPpal extends javax.swing.JFrame {
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Sistema de gestión ULP");
         setIconImage(getIconImage());
-        setPreferredSize(new java.awt.Dimension(950, 585));
 
         escritorio.setPreferredSize(new java.awt.Dimension(900, 610));
 
