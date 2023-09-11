@@ -34,7 +34,7 @@ public class ConexionMySQL { //
 	private static final String USERmysql = "john";
 	private static final String PASSmysql = "molina";						  
 	// datos de mariadb de los chicos
-	private static final String DRIVERmariadb = "org.mariaDB.jdbc.Driver";    // este es el driver para mariaDB que usan los chicos
+	private static final String DRIVERmariadb = "org.mariadb.jdbc.Driver";    // este es el driver para mariaDB que usan los chicos
 	private static final String URLmariadb = "jdbc:mariadb://localhost/"+DB;  // esta es la ruta que usan los chicos para mariaDB
 	private static final String USERmariadb = "root";
 	private static final String PASSmariadb = "";							  
