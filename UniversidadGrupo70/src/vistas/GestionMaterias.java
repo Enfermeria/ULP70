@@ -85,7 +85,7 @@ public class GestionMaterias extends javax.swing.JInternalFrame {
 				return true;
 			} else									
 				return false;
-            //tabla.removeRowSelectionInterval(0, tabla.getRowCount()-1); //des-selecciono las filas de la tabla .
+            //tabla.removeRowSelectionInterval(0, tabla.getRowCount()-1); //des-selecciono las filas de la tabla. A
         } else {
 			JOptionPane.showMessageDialog(this, "Debe seleccionar una materia para eliminar", "Ninguna materia seleccionada", JOptionPane.ERROR_MESSAGE);
 			return false;
