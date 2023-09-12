@@ -6,10 +6,14 @@
 package vistas;
 
 import accesoadatos.MateriaData;
+import accesoadatos.MateriaData.Ordenacion;
 import entidades.Materia;
+import java.awt.Color;
 import java.util.List;
 import javax.swing.table.DefaultTableModel;
-
+import accesoadatos.Utils;
+import javax.swing.JOptionPane;
+import entidades.Materia;
 /**
  *
  * @author john
@@ -17,18 +21,360 @@ import javax.swing.table.DefaultTableModel;
 public class GestionMaterias extends javax.swing.JInternalFrame {
 	DefaultTableModel modeloTabla;
 	public static List<Materia> listaMaterias;
-	private final MateriaData alumnoData;	
+	private final MateriaData materiaData;	
 	private enum TipoEdicion {AGREGAR, MODIFICAR, BUSCAR};
 	private TipoEdicion tipoEdicion = TipoEdicion.AGREGAR; //para que el boton guardar sepa que estoy queriendo hacer:
-														   // Si con los campos voy a agregar, modificar o buscar un alumno
-	private MateriaData.Ordenacion ordenacion = MateriaData.Ordenacion.PORIDALUMNO; // defino el tipo de orden por defecto 
-	private Filtro filtro = new Filtro();  //el filtro de búsqueda
+														   // Si con los campos voy a agregar, modificar o buscar un materia
+	private MateriaData.Ordenacion ordenacion = MateriaData.Ordenacion.PORIDMATERIA; // defino el tipo de orden por defecto 
+	private FiltroMaterias filtro = new FiltroMaterias();  //el filtro de búsqueda
 	
 	
 	public GestionMaterias() {
 		initComponents();
+		materiaData = new MateriaData(); 
+		modeloTabla = (DefaultTableModel) tablaMaterias.getModel();
+		cargarListaMaterias(); //carga la base de datos
+		cargarTabla(); // cargo la tabla con las materias
+
 	}
 
+	
+		/** carga la lista de materias de la BD */
+	private void cargarListaMaterias(){ 
+		if (filtro.estoyFiltrando) 
+			listaMaterias = materiaData.getListaMateriasXCriterioDeBusqueda(filtro.id, filtro.anio, filtro.nombre, ordenacion);
+		else
+			listaMaterias = materiaData.getListaMaterias(ordenacion);
+	}
+	
+	
+	/** carga materias de la lista a la tabla */
+	private void cargarTabla(){ 
+		//borro las filas de la tabla
+		for (int fila = modeloTabla.getRowCount() -  1; fila >= 0; fila--)
+			modeloTabla.removeRow(fila);
+		
+		//cargo los materias de listaMaterias a la tabla
+		for (Materia materia : listaMaterias) {
+			modeloTabla.addRow(new Object[] {
+				materia.getIdmateria(),
+				materia.getAnio(),
+				materia.getNombre(),
+				materia.getEstado() } 
+			);
+		}
+		
+		//como no hay fila seleccionada, deshabilito el botón Eliminar y Modificar
+		if (tablaMaterias.getSelectedRow() == -1) {// si no hay alguna fila seleccionada
+			btnEliminar.setEnabled(false); // deshabilito el botón de eliminar
+			btnModificar.setEnabled(false); // deshabilito el botón de Modificar
+		}
+	} //cargarTabla
+	
+	
+	/** 
+	 * Elimina al materia seleccionado de la lista y la bd. 
+	 * @return Devuelve true si pudo eliminarlo
+	 */
+	private boolean eliminarMateria(){ 
+		int fila = tablaMaterias.getSelectedRow();
+        if (fila != -1) { // Si hay alguna fila seleccionada
+			int idMateria = Integer.parseInt(txtId.getText());
+			if (materiaData.bajaMateria(idMateria)){
+				listaMaterias.remove(fila);
+				return true;
+			} else									
+				return false;
+            //tabla.removeRowSelectionInterval(0, tabla.getRowCount()-1); //des-selecciono las filas de la tabla
+        } else {
+			JOptionPane.showMessageDialog(this, "Debe seleccionar una materia para eliminar", "Ninguna materia seleccionada", JOptionPane.ERROR_MESSAGE);
+			return false;
+		}
+	} //eliminarMateria
+	
+	
+	/**
+	 * si no hay errores en los campos, agrega un materia con dichos campos. 
+	 * @return Devuelve true si pudo agregarlo
+	 */
+	private boolean agregarMateria(){
+		Materia materia = campos2Materia();
+		if ( materia != null ) {
+			if ( materiaData.altaMateria(materia) ) {// si pudo dar de alta al materia
+				cargarListaMaterias();
+				cargarTabla();
+				return true;
+			} else {
+				JOptionPane.showMessageDialog(this, "Debe completar correctamente todos los datos del materia para agregarlo y sin dni duplicado", "No se puede agregar", JOptionPane.ERROR_MESSAGE);
+				return false;
+			}
+		} else {
+			// si materia es null, no pudo transformarlo a materia. Sigo editando
+			return false;
+		}
+	} //agregarMateria
+
+	
+	/** si no hay errores en los campos, modifica un materia con dichos campos */
+	private void modificarMateria() {
+		Materia materia = campos2Materia();
+		if ( materia != null ) {
+			if ( materiaData.modificarMateria(materia) )  {// si pudo  modificar al materia
+				cargarListaMaterias();
+				cargarTabla();
+			} else 
+				JOptionPane.showMessageDialog(this, "Debe completar correctamente todos los datos de la materia para modificarla", "No se puede agregar", JOptionPane.ERROR_MESSAGE);			
+		} else {
+			// si materia es null, no pudo transformarlo a materia. Sigo editando
+		}	
+	} //modificarMateria
+	
+	
+	
+	/**
+	 * Busca al materia por id, por anio, o por nombre (o por 
+	 * combinación de dichos campos). 
+	 * El criterio para usar un campo en la búsqueda es que no esté en blanco. 
+	 * Es decir, si tiene datos, se buscará por ese dato. Por ejemplo, si puso 
+	 * el id, buscará por id. Si puso el anio, buscará por anio. 
+	 * Si puso el anio y Nombre, buscara por anio and nombre.
+	 * 
+	 * @return devuelve true sio pudo usar algún criterio de búsqueda
+	 */
+	private boolean buscarMateria(){ 
+		// cargo los campos de texto id, anio, y nombre para buscar por esos criterior
+		int idMateria, anio;
+		String nombre;
+		
+		//idMateria
+		try {
+			if (txtId.getText().isEmpty()) // si está vacío no se usa para buscar
+				idMateria = -1;
+			else
+				idMateria = Integer.valueOf(txtId.getText()); //no vacío, participa del criterio de búsqueda
+		} catch (NumberFormatException e) {
+			JOptionPane.showMessageDialog(this, "El Id debe ser un número válido", "Id no válido", JOptionPane.ERROR_MESSAGE);
+			return false;
+		}
+		//dni
+		try {
+			if (txtAnio.getText().isEmpty()) // si está vacío no se usa para buscar
+				anio = -1;
+			else
+				anio = Integer.valueOf(txtAnio.getText()); // no vacío, participa del criterio de búsqueda
+				
+		} catch (NumberFormatException e) {
+			JOptionPane.showMessageDialog(this, "El año debe ser un número válido", "Año no válido", JOptionPane.ERROR_MESSAGE);
+			return false;
+		}
+		
+		//apellido y nombre
+		nombre = txtNombre.getText();
+		
+		//testeo que hay al menos un criterio de búsqueda
+		if ( idMateria==-1 && anio==-1 && nombre.isEmpty()  )   {
+			JOptionPane.showMessageDialog(this, "Debe ingresar algún criterio para buscar", "Ningun criterio de búsqueda", JOptionPane.ERROR_MESSAGE);
+			return false;
+		} else { //todo Ok. Buscar por alguno de los criterior de búsqueda
+			filtro.id = idMateria;
+			filtro.anio = anio;
+			filtro.nombre = nombre;
+			filtro.estoyFiltrando = true;
+			cargarListaMaterias();
+			cargarTabla();
+			return true; // pudo buscar
+		}
+	} //buscarMateria
+	
+
+	
+	
+	
+	/** deshabilito todos los botones y tabla, habilito guardar/cancelar */
+	private void habilitoParaBuscar(){ 
+		habilitoParaEditar();
+		txtId.setEditable(true);
+		checkboxEstado.setEnabled(false);	  //AVERIGUAR COMO HACER SETEDITABLE(FALSE), ASI NO QUEDA COLOR DISMINUIDO
+	} //habilitoParaBuscar
+
+	
+		
+	
+	/** deshabilito todos los botones y tabla, habilito guardar/cancelar */
+	private void habilitoParaEditar(){ 
+		// deshabilito todos los botones (menos salir)
+		btnAgregar.setEnabled(false);
+		btnModificar.setEnabled(false); //deshabilito botón modificar
+		btnEliminar.setEnabled(false);  //deshabilito botón eliminar
+		btnBuscar.setEnabled(false);
+		cboxOrden.setEnabled(false);
+		
+		//Deshabilito la Tabla para que no pueda hacer click
+		tablaMaterias.setEnabled(false);
+		
+		//Habilito los botones guardar y cancelar
+		btnGuardar.setEnabled(true); // este botón es el que realmente se encargará de agregegar el materia
+		btnCancelar.setEnabled(true);
+		
+		//Habilito los campos para poder editar
+		txtAnio.setEditable(true);
+		txtNombre.setEditable(true);
+		checkboxEstado.setEnabled(true);
+	} //habilitoParaEditar
+
+	
+	
+	
+	/** habilito todos los botones y tabla, deshabilito guardar/cancelar y modificar */
+	private void deshabilitoParaEditar(){ 
+		limpiarCampos(); //Pongo todos los campos de texto en blanco
+		// habilito todos los botones (menos salir)
+		btnAgregar.setEnabled(true);
+		btnBuscar.setEnabled(true);
+		cboxOrden.setEnabled(true);
+		
+		//sigo deshabilitando los botones modificar y eliminar porque no hay una fila seleccionada.
+		btnModificar.setEnabled(false); //deshabilito botón modificar
+		btnEliminar.setEnabled(false);  //deshabilito botón eliminar
+		
+		//Habilito la Tabla para que pueda hacer click
+		tablaMaterias.setEnabled(true);
+		
+		//Deshabilito el boton guardar 
+		btnGuardar.setEnabled(false);  
+		botonGuardarComoGuardar(); //por si estaba buscando cambio icono y texto del btnGuardar a "Guardar"
+		
+		//deshabilito el boton cancelar
+		btnCancelar.setEnabled(false);
+
+		//deshabilito los campos para poder que no pueda editar
+		txtId.setEditable(false);
+		txtAnio.setEditable(false);
+		txtNombre.setEditable(false);
+		checkboxEstado.setEnabled(false);	  //AVERIGUAR COMO HACER SETEDITABLE(FALSE), ASI NO QUEDA COLOR DISMINUIDO
+	} //deshabilitoParaEditar
+
+	
+	
+	
+	
+	/** pongo los campos txtfield en blanco y deselecciono la fila de tabla */
+	private void limpiarCampos(){
+		//pongo los campos en blanco
+		txtId.setText("");
+		txtAnio.setText("");
+		txtNombre.setText("");
+		checkboxEstado.setSelected(false);
+		tablaMaterias.removeRowSelectionInterval(0, tablaMaterias.getRowCount()-1); //des-selecciono las filas de la tabla
+	} // limpiarCampos
+
+
+
+
+	/**
+	 * cargo los datos de la fila indicada de la tabla a los campos de texto de la pantalla 
+	 * @param numfila el número de fila a cargar a los campos
+	 */
+	private void filaTabla2Campos(int numfila){
+		txtId.setText(tablaMaterias.getValueAt(numfila, 0)+"");
+		txtAnio.setText(tablaMaterias.getValueAt(numfila, 1)+"");
+		txtNombre.setText((String)tablaMaterias.getValueAt(numfila, 2));
+		checkboxEstado.setSelected((Boolean)tablaMaterias.getValueAt(numfila, 3));
+	} //filaTabla2Campos
+
+
+	
+	
+	/**
+	 * Cargo los campos de texto de la pantalla a un objeto tipo Materia
+	 * @return El Materia devuelto. Si hay algún error, devuelve null
+	 */
+	private Materia campos2Materia(){ 
+		int idMateria, anio;
+		String nombre;
+		boolean estado;
+		
+		//idMateria
+		try {
+			if (txtId.getText().isEmpty()) // en el alta será un string vacío
+				idMateria = -1;
+			else
+				idMateria = Integer.valueOf(txtId.getText()); // obtengo el identificador el materia
+		} catch (NumberFormatException e) {
+			JOptionPane.showMessageDialog(this, "El Id debe ser un número válido", "Id no válido", JOptionPane.ERROR_MESSAGE);
+			return null;
+		}
+		
+		//dni
+		try {
+			anio = Integer.valueOf(txtAnio.getText());
+				
+		} catch (NumberFormatException e) {
+			JOptionPane.showMessageDialog(this, "El año debe ser un número válido", "Año no válido", JOptionPane.ERROR_MESSAGE);
+			return null;
+		}
+		
+		//apellido y nombre
+		nombre = txtNombre.getText();
+				
+		//estado
+		estado = checkboxEstado.isSelected(); 
+		
+		return new Materia(idMateria, nombre, anio, estado);
+	} // campos2Materia
+	
+	
+	
+	/** cambia el icono y texto del btnGuardar a "Guardar" */
+	private void botonGuardarComoGuardar(){ 
+		btnGuardar.setText("Guardar");
+		btnGuardar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/guardar2_32x32.png")));
+	}	
+
+	
+	/** cambia el icono y texto del btnGuardar guardar a "Buscar" */
+	private void botonGuardarComoBuscar(){ 
+		btnGuardar.setText(" Buscar ");
+		btnGuardar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/lupa4_32x32.png")));
+	}	
+
+	
+	/** 
+	 * cambia titulo y color de panel de tabla para reflejar que está filtrada.
+	 * Habilita btnResetearFiltro
+	*/
+	private void setearFiltro(){
+			//cambio el titulo de la tabla y color panel de tabla para que muestre que está filtrado
+			lblTituloTabla.setText("Listado de materias filtrado por búsqueda");
+			panelTabla.setBackground(new Color(255, 51, 51));
+			btnResetearFiltro.setEnabled(true);
+			filtro.estoyFiltrando = true;
+	} //setearFiltro
+	
+	
+	/** 
+	 * Restaur titulo y color de panel de tabla para reflejar que ya no está filtrada.
+	 * Deshabilita btnResetearFiltro
+	*/
+	private void resetearFiltro(){
+			//cambio el titulo de la tabla y color panel de tabla para que muestre que no está filtrado
+			//cambio el titulo de la tabla y color panel de tabla para que muestre que está filtrado
+			lblTituloTabla.setText("Listado de materias");
+			panelTabla.setBackground(new Color(153, 153, 255));
+			btnResetearFiltro.setEnabled(false);
+			filtro.estoyFiltrando = false;
+	} //setearFiltro
+	
+	
+	
+	
+	
+	
+/*=====================================================================================================================*/	
+	
+	
+	
+	
 	/**
 	 * This method is called from within the constructor to initialize the form.
 	 * WARNING: Do NOT modify this code. The content of this method is always
@@ -362,64 +708,110 @@ public class GestionMaterias extends javax.swing.JInternalFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+	
+	
+	
+	/** permite editar en los campos, habilita boton de guardar/cancelar y deshabilita otros botones.
+	    El alta verdadera lo realiza el botón de guardar (si no eligió cancelar) */
     private void btnAgregarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAgregarActionPerformed
-        tipoEdicion = TipoEdicion.AGREGAR;  //para que el boton guardar sepa que estoy queriendo agregar un alumno
+        tipoEdicion = TipoEdicion.AGREGAR;  //para que el boton guardar sepa que estoy queriendo agregar un materia
         limpiarCampos(); //Pongo todos los campos de texto en blanco
         habilitoParaEditar();
     }//GEN-LAST:event_btnAgregarActionPerformed
 
+	
+	
+	
+	/** 
+	 * Permite editar en los campos, habilita boton de guardar/cancelar y deshabilita otros botones.
+	 * La modificación verdadera lo realiza el botón de guardar (si no eligió cancelar)
+	 */ 
     private void btnModificarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnModificarActionPerformed
-        tipoEdicion = TipoEdicion.MODIFICAR; //para que el boton guardar sepa que estoy queriendo modificar un alumno
+        tipoEdicion = TipoEdicion.MODIFICAR; //para que el boton guardar sepa que estoy queriendo modificar un materia
         habilitoParaEditar();
     }//GEN-LAST:event_btnModificarActionPerformed
 
+	
+	
+	
+	/** 
+	 * Elimina la materia seleccionado de la tabla. 
+	 * Como no queda ninguno seleccionado, deshabilito botones btnModificar y btnEliminar
+	 */
     private void btnEliminarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEliminarActionPerformed
-        if ( eliminarAlumno() ) { // si pudo eliminar
+        if ( eliminarMateria() ) { // si pudo eliminar
             limpiarCampos(); //Pongo todos los campos de texto en blanco
             btnModificar.setEnabled(false); //deshabilito botón modificar
             btnEliminar.setEnabled(false);  //deshabilito botón eliminar
-            cargarListaAlumnos();
+            cargarListaMaterias();
             cargarTabla();
         }
     }//GEN-LAST:event_btnEliminarActionPerformed
 
+	
+	
+	
+	/**
+	 * Permite editar en los campos, cambia el botón guardar a buscar, 
+	 * habilita boton de guardar/cancelar y deshabilita otros botones.
+	 * La búsqueda verdadera lo realiza el botón de guardar (si no eligió cancelar)
+	 */
     private void btnBuscarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBuscarActionPerformed
-        tipoEdicion = TipoEdicion.BUSCAR; //para que el boton guardar sepa que estoy queriendo buscar un alumno
+        tipoEdicion = TipoEdicion.BUSCAR; //para que el boton guardar sepa que estoy queriendo buscar un materia
         limpiarCampos();
         botonGuardarComoBuscar(); //cambio icono y texto del btnGuardar a "Buscar"
         habilitoParaBuscar();
     }//GEN-LAST:event_btnBuscarActionPerformed
 
+	
+	
+	/** Cierra la ventana (termina GestionMaterias */
     private void btnSalirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSalirActionPerformed
         dispose();//cierra la ventana
     }//GEN-LAST:event_btnSalirActionPerformed
 
+	
+	
+	/**
+	 * Elije el tipo de ordenación de las materias, por Idmateria, por anio o por nombre.
+	 * @param evt 
+	 */
     private void cboxOrdenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cboxOrdenActionPerformed
         if (cboxOrden.getSelectedIndex() == 0)
-        ordenacion = Ordenacion.PORIDALUMNO;
+        ordenacion = Ordenacion.PORIDMATERIA;
         else if (cboxOrden.getSelectedIndex() == 1)
-        ordenacion = Ordenacion.PORDNI;
+        ordenacion = Ordenacion.PORANIO;
         else if (cboxOrden.getSelectedIndex() == 2)
-        ordenacion = Ordenacion.PORAPYNO;
+        ordenacion = Ordenacion.PORNOMBRE;
         else // por las dudas que no eligio uno correcto
-        ordenacion = Ordenacion.PORIDALUMNO;
+        ordenacion = Ordenacion.PORIDMATERIA;
 
-        cargarListaAlumnos();
+        cargarListaMaterias();
         cargarTabla();
         limpiarCampos();
         botonGuardarComoGuardar();
         deshabilitoParaEditar();
     }//GEN-LAST:event_cboxOrdenActionPerformed
 
+	
+	
+	
     private void cboxOrdenPropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_cboxOrdenPropertyChange
         System.out.println("Cambio property de cboxOrden");
     }//GEN-LAST:event_cboxOrdenPropertyChange
 
+	
+	
+	
+	/** al hacer clik en una fila de la tabla, queda seleccionado una materia.
+	 * Entonces habilita los botones de eliminar y modificar
+	 * @param evt 
+	 */
     private void tablaMateriasMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tablaMateriasMouseClicked
         //tabla.addRowSelectionInterval(filaTabla, filaTabla); //selecciono esa fila de la tabla
-        if (tablaAlumnos.getSelectedRow() != -1){ // si hay alguna fila seleccionada
+        if (tablaMaterias.getSelectedRow() != -1){ // si hay alguna fila seleccionada
         }
-        int numfila = tablaAlumnos.getSelectedRow();
+        int numfila = tablaMaterias.getSelectedRow();
         if (numfila != -1) {
             btnEliminar.setEnabled(true); // habilito el botón de eliminar
             btnModificar.setEnabled(true); // habilito el botón de modificar
@@ -428,25 +820,38 @@ public class GestionMaterias extends javax.swing.JInternalFrame {
         }
     }//GEN-LAST:event_tablaMateriasMouseClicked
 
+	
+	
+	
+	/** 
+	 * Restaura la tabla a la lista total, pone los campos en blanco, 
+	 * restaura el color de fondo del panel y deshabilita btnResetearFiltro
+	 * @param evt 
+	 */
     private void btnResetearFiltroActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnResetearFiltroActionPerformed
         resetearFiltro();
-        cargarListaAlumnos();
+        cargarListaMaterias();
         cargarTabla();
         limpiarCampos();
         botonGuardarComoGuardar();//por si estaba buscando cambio icono y texto del btnGuardar a "Guardar"
         deshabilitoParaEditar();
     }//GEN-LAST:event_btnResetearFiltroActionPerformed
 
+	
+	
+	
+	/** con los campos de texto de la pantalla hace un agregarMateria, modificarMateria o buscarMateria
+	    en base a la variable tipoEdicion, ya sea AGREGAR, MODIFICAR o BUSCAR */
     private void btnGuardarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGuardarActionPerformed
 
-        if ( tipoEdicion == TipoEdicion.AGREGAR ){ //agregar el alumno
-            agregarAlumno();
+        if ( tipoEdicion == TipoEdicion.AGREGAR ){ //agregar el materia
+            agregarMateria();
             resetearFiltro();
-        } else if ( tipoEdicion == TipoEdicion.MODIFICAR ) { // modificar el alumno
-            modificarAlumno();
+        } else if ( tipoEdicion == TipoEdicion.MODIFICAR ) { // modificar el materia
+            modificarMateria();
             resetearFiltro();
-        } else { // tipoEdicion = BUSCAR: quiere buscar un alumno
-            buscarAlumno();
+        } else { // tipoEdicion = BUSCAR: quiere buscar un materia
+            buscarMateria();
             setearFiltro();
         }
 
@@ -455,6 +860,10 @@ public class GestionMaterias extends javax.swing.JInternalFrame {
         deshabilitoParaEditar();
     }//GEN-LAST:event_btnGuardarActionPerformed
 
+	
+	
+	
+	/** Cancela la edición de campos para agregar, modificar o buscar. */
     private void btnCancelarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelarActionPerformed
         limpiarCampos();
         botonGuardarComoGuardar(); //por si estaba buscando cambio icono y texto del btnGuardar a "Guardar"
@@ -486,4 +895,24 @@ public class GestionMaterias extends javax.swing.JInternalFrame {
     private javax.swing.JTextField txtId;
     private javax.swing.JTextField txtNombre;
     // End of variables declaration//GEN-END:variables
-}
+} //GestionMaterias
+
+
+
+/**
+ * Es una clase para agrupar y almacenar los datos con los que se filtra una búsqueda
+ * @author John David Molina Velarde
+ */
+class FiltroMaterias{
+	int id;
+	int anio;
+	String nombre;
+	boolean estoyFiltrando;
+
+	public FiltroMaterias() { // constructor
+		id = -1;
+		anio = -1;
+		nombre = "";
+		estoyFiltrando = false;
+	} //Constructor
+} //FiltroMaterias

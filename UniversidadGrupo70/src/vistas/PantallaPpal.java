@@ -73,6 +73,11 @@ public class PantallaPpal extends javax.swing.JFrame {
         jMenu2.setText("Materias");
 
         menuGestionMaterias.setText("Gestión de materias");
+        menuGestionMaterias.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                menuGestionMateriasActionPerformed(evt);
+            }
+        });
         jMenu2.add(menuGestionMaterias);
 
         jMenuBar1.add(jMenu2);
@@ -129,6 +134,17 @@ public class PantallaPpal extends javax.swing.JFrame {
         dispose();//cierra la ventana
 		//System.exit(0);// termina el programa
     }//GEN-LAST:event_menuSalirSistemaActionPerformed
+
+    private void menuGestionMateriasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuGestionMateriasActionPerformed
+        	escritorio.removeAll(); // cierro todas las ventanas del escritorio
+		escritorio.repaint();
+		
+		GestionMaterias gm = new GestionMaterias(); // creo un internal Frame
+		gm.setVisible(true); // lo pongo visible
+		
+		escritorio.add(gm); // lo pongo en el escritorio
+		escritorio.moveToFront(gm); //pongo la ventana al frente:
+    }//GEN-LAST:event_menuGestionMateriasActionPerformed
 
 	
 	@Override

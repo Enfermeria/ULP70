@@ -84,11 +84,11 @@ public class GestionAlumnos extends javax.swing.JInternalFrame {
 		int fila = tablaAlumnos.getSelectedRow();
         if (fila != -1) { // Si hay alguna fila seleccionada
 			int idAlumno = Integer.parseInt(txtId.getText());
-			//if (alumnoData.bajaAlumno(idAlumno))  //por precaucion por ahora no lo borro de la bd. DESPUES HABILITAR ESTO!!!
+			if (alumnoData.bajaAlumno(idAlumno)){ 
 				listaAlumnos.remove(fila);
 				return true;
-			//else									//DESPUES HABILITAR ESTO
-			//	return false;
+			} else
+				return false;
             //tabla.removeRowSelectionInterval(0, tabla.getRowCount()-1); //des-selecciono las filas de la tabla
         } else {
 			JOptionPane.showMessageDialog(this, "Debe seleccionar un alumno para eliminar", "Ningun alumno seleccionado", JOptionPane.ERROR_MESSAGE);
@@ -934,7 +934,7 @@ public class GestionAlumnos extends javax.swing.JInternalFrame {
     private javax.swing.JTextField txtId;
     private javax.swing.JTextField txtNombre;
     // End of variables declaration//GEN-END:variables
-}
+} //GestionAlumnos
 
 /**
  * Es una clase para agrupar y almacenar los datos con los que se filtra una búsqueda
