@@ -11,6 +11,7 @@
 
 package universidadgrupo70;
 
+import vistas.Login;
 import vistas.PantallaPpal;
 
 /**
@@ -20,9 +21,15 @@ import vistas.PantallaPpal;
 public class UniversidadGrupo70 {
 
 	public static void main(String[] args) {
-		PantallaPpal pantallaPpal = new PantallaPpal(); //creo una pantallaPpal
-		pantallaPpal.setVisible(true); // lo hago visible
-		pantallaPpal.setLocationRelativeTo(null); // abrirlo en el centro		
+		//Entrada al sistema de gestión administrativa directamente
+		//PantallaPpal pantallaPpal = new PantallaPpal(); //creo una pantallaPpal
+		//pantallaPpal.setVisible(true); // lo hago visible
+		//pantallaPpal.setLocationRelativeTo(null); // abrirlo en el centro		
+		
+		//Entrada a la pantalla de login
+		Login login = new Login(); //creo una pantalla de login
+		login.setVisible(true); // lo hago visible
+		login.setLocationRelativeTo(null); // abrirlo en el centro		
 	}
 	
 }
