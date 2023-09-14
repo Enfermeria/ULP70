@@ -13,7 +13,7 @@ import entidades.Alumno;
 
 /**
  *
- * @author John David Molina Velarde
+ * @author John David Molina Velarde, Leticia Mores, Enrique Germán Martínez, Carlos Eduardo Beltrán
  */
 public class GestionAlumnos extends javax.swing.JInternalFrame {
 	DefaultTableModel modeloTabla;

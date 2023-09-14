@@ -58,13 +58,13 @@ public class Login extends javax.swing.JFrame {
         jLPass.setText("Password");
         getContentPane().add(jLPass, new org.netbeans.lib.awtextra.AbsoluteConstraints(45, 386, -1, -1));
 
-        jTNombre.setFont(new java.awt.Font("Sitka Text", 0, 16)); // NOI18N
+        jTNombre.setFont(new java.awt.Font("Sitka Text", 0, 14)); // NOI18N
         getContentPane().add(jTNombre, new org.netbeans.lib.awtextra.AbsoluteConstraints(220, 310, 110, 20));
 
-        jTApellido.setFont(new java.awt.Font("Sitka Text", 0, 16)); // NOI18N
+        jTApellido.setFont(new java.awt.Font("Sitka Text", 0, 14)); // NOI18N
         getContentPane().add(jTApellido, new org.netbeans.lib.awtextra.AbsoluteConstraints(220, 350, 110, 20));
 
-        jPassword.setFont(new java.awt.Font("Sitka Text", 0, 16)); // NOI18N
+        jPassword.setFont(new java.awt.Font("Sitka Text", 0, 14)); // NOI18N
         getContentPane().add(jPassword, new org.netbeans.lib.awtextra.AbsoluteConstraints(220, 390, 110, 20));
 
         jBLogin.setBackground(new java.awt.Color(71, 78, 194));
