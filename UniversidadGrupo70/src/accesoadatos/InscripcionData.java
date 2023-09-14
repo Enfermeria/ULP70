@@ -151,6 +151,22 @@ public class InscripcionData {
 	}
 	
 	
+        
+        public List<Inscripcion> getListaInscripcionesDisponibles(int idAlumno){ // devuelve una lista con los inscripciones de ese alumno de la base de datos
+		ArrayList<Inscripcion> lista = new ArrayList();
+		String sql = "Select * from inscripcion where idalumno<>" + idAlumno;
+		ResultSet rs = conexion.sqlSelect(sql);
+		try {
+			while (rs.next()) {
+				Inscripcion inscripcion = resultSet2Inscripcion(rs);
+				lista.add(inscripcion);
+			}
+			conexion.cerrarSentencia(); // cierra el PreparedStatement y tambien cierra automaticamente el ResultSet
+		} catch (SQLException ex) {
+			mensajeError("Error al obtener lista de inscripciones" + ex.getMessage());
+		}
+		return lista;
+	}
 
 
 	

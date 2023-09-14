@@ -85,6 +85,11 @@ public class PantallaPpal extends javax.swing.JFrame {
         jMenu3.setText("Inscripciones");
 
         menuGestionInscripciones.setText("Gestión de inscripciones");
+        menuGestionInscripciones.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                menuGestionInscripcionesActionPerformed(evt);
+            }
+        });
         jMenu3.add(menuGestionInscripciones);
 
         jMenuBar1.add(jMenu3);
@@ -145,6 +150,17 @@ public class PantallaPpal extends javax.swing.JFrame {
 		escritorio.add(gm); // lo pongo en el escritorio
 		escritorio.moveToFront(gm); //pongo la ventana al frente:
     }//GEN-LAST:event_menuGestionMateriasActionPerformed
+
+    private void menuGestionInscripcionesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuGestionInscripcionesActionPerformed
+                escritorio.removeAll(); // cierro todas las ventanas del escritorio
+		escritorio.repaint();
+		
+		GestionInscripciones gi = new GestionInscripciones(); // creo un internal Frame
+		gi.setVisible(true); // lo pongo visible
+		
+		escritorio.add(gi); // lo pongo en el escritorio
+		escritorio.moveToFront(gi); //pongo la ventana al frente:
+    }//GEN-LAST:event_menuGestionInscripcionesActionPerformed
 
 	
 	@Override

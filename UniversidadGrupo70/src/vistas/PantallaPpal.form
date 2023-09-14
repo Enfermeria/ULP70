@@ -43,6 +43,9 @@
               <Properties>
                 <Property name="text" type="java.lang.String" value="Gesti&#xf3;n de inscripciones"/>
               </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="menuGestionInscripcionesActionPerformed"/>
+              </Events>
             </MenuItem>
           </SubComponents>
         </Menu>

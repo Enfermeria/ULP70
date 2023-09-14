@@ -3,8 +3,12 @@ package vistas;
 
 import accesoadatos.AlumnoData;
 import accesoadatos.AlumnoData.Ordenacion;
+import accesoadatos.InscripcionData;
+import accesoadatos.MateriaData;
 import accesoadatos.Utils;
 import entidades.Alumno;
+import entidades.Inscripcion;
+import entidades.Materia;
 import java.time.LocalDate;
 import java.util.List;
 import javax.swing.JOptionPane;
@@ -15,9 +19,13 @@ import javax.swing.table.DefaultTableModel;
  * @author John David Molina Velarde, Leticia Mores, Enrique Germán Martínez, Carlos Eduardo Beltrán
  */
 public class GestionInscripciones extends javax.swing.JInternalFrame {
-	DefaultTableModel modeloTablaAlumnos;
+	DefaultTableModel modeloTablaAlumnos, modeloTablaMateriasInscriptas, modeloTablaMateriasDisponibles;
 	public static List<Alumno> listaAlumnos;
+        public static List<Inscripcion> listaInscripcionesDelAlumno;
+        public static List<Inscripcion> listaMateriasDisponibles;
 	private final AlumnoData alumnoData;	
+        private final MateriaData materiaData;
+        private final InscripcionData inscripcionData;
 	// private enum TipoEdicion {AGREGAR, MODIFICAR, BUSCAR};
 	private Ordenacion ordenacion = Ordenacion.PORIDALUMNO; // defino el tipo de orden por defecto 
 	private Filtro filtro = new Filtro();  //el filtro de búsqueda
@@ -28,8 +36,13 @@ public class GestionInscripciones extends javax.swing.JInternalFrame {
 	 */
 	public GestionInscripciones() {
 		initComponents();
-		alumnoData = new AlumnoData(); 
-		modeloTablaAlumnos = (DefaultTableModel) tablaAlumnos.getModel();
+		alumnoData = new AlumnoData();
+                materiaData = new MateriaData();
+                inscripcionData = new InscripcionData();
+                modeloTablaAlumnos = (DefaultTableModel) tablaAlumnos.getModel();
+                modeloTablaMateriasInscriptas = (DefaultTableModel) tablaMateriasInscriptas.getModel();
+                modeloTablaMateriasDisponibles = (DefaultTableModel) tablaMateriasDisponibles.getModel();
+                
 		cargarListaAlumnos(); //carga la base de datos
 		cargarTablaAlumnos(); // cargo la tabla con los alumnos
 	} // constructor
@@ -65,10 +78,36 @@ public class GestionInscripciones extends javax.swing.JInternalFrame {
 		if (tablaAlumnos.getSelectedRow() == -1) {// si no hay alguna fila seleccionada
 			btnInscribirse.setEnabled(false); // deshabilito el botón de Inscribir
 			btnDesinscribirse.setEnabled(false); // deshabilito el botón de Desinscribir
-		}
+                        borrarTablaMaterias();
+                       
+		}else {//hay una fila seleccionada, cargamos y mostramos las tablas de materias inscriptas y disponibles.
+                    cargarListaMaterias(filaTabla2IdAlumno(tablaAlumnos.getSelectedRow()));
+                }
 	} //cargarTablaAlumnos
 	
 	
+        /**
+         * En base al idAlumno que nos pasan, cargamos la lista de materias 
+         * inscriptas y disponibles de ese alumno.
+         * @param idAlumno 
+         */
+        private void cargarListaMaterias(int idAlumno){
+            listaInscripciones = InscripcionData
+        }// cargarListaMaterias
+        
+        
+        /**
+         * como no hay ningun alumno seleccionado, borra los datos de las tablas de materias.
+         */
+        private void borrarTablaMaterias(){
+            //borro las filas de la tabla de materias inscriptas
+            for (int fila = modeloTablaMateriasInscriptas.getRowCount() -  1; fila >= 0; fila--)
+		modeloTablaMateriasInscriptas.removeRow(fila);
+            //borro las filas de la tabla de materias disponibles
+            for (int fila = modeloTablaMateriasDisponibles.getRowCount() -  1; fila >= 0; fila--)
+		modeloTablaMateriasDisponibles.removeRow(fila);
+        }// borrarTablaMaterias
+        
 	
 	/**
 	 * Busca al alumno por id, por dni, por apellido o por nombre (o por 
@@ -131,10 +170,13 @@ public class GestionInscripciones extends javax.swing.JInternalFrame {
 	
 	
 	
-	/** deshabilito todos los botones y tabla, habilito guardar/cancelar */
+	/** habilito boton buscar cuando alguno de los campos tenga datos*/
 	private void habilitoParaBuscar(){ 
-		habilitoParaEditar();
-		txtId.setEditable(true);
+		
+                if (txtId.getText()!=null || txtDni.getText()!= null || txtApellido.getText() != null || txtNombre.getText() != null){
+                    btnBuscar.setEnabled(true);
+                }
+		
 	} //habilitoParaBuscar
 
 	
@@ -143,9 +185,7 @@ public class GestionInscripciones extends javax.swing.JInternalFrame {
 	/** deshabilito todos los botones y tabla, habilito guardar/cancelar */
 	private void habilitoParaEditar(){ 
 		// deshabilito todos los botones (menos salir)
-		btnAgregar.setEnabled(false);
-		btnModificar.setEnabled(false); //deshabilito botón modificar
-		btnEliminar.setEnabled(false);  //deshabilito botón eliminar
+		
 		btnBuscar.setEnabled(false);
 		cboxOrden.setEnabled(false);
 		
@@ -153,15 +193,14 @@ public class GestionInscripciones extends javax.swing.JInternalFrame {
 		tablaAlumnos.setEnabled(false);
 		
 		//Habilito los botones guardar y cancelar
-		btnGuardar.setEnabled(true); // este botón es el que realmente se encargará de agregegar el alumno
+		
 		btnCancelar.setEnabled(true);
 		
 		//Habilito los campos para poder editar
 		txtDni.setEditable(true);
 		txtApellido.setEditable(true);
 		txtNombre.setEditable(true);
-		jdcFechaNacimiento.setEnabled(true);
-		checkboxEstado.setEnabled(true);
+		
 	} //habilitoParaEditar
 
 	
@@ -171,31 +210,19 @@ public class GestionInscripciones extends javax.swing.JInternalFrame {
 	private void deshabilitoParaEditar(){ 
 		limpiarCampos(); //Pongo todos los campos de texto en blanco
 		// habilito todos los botones (menos salir)
-		btnAgregar.setEnabled(true);
+		
 		btnBuscar.setEnabled(true);
 		cboxOrden.setEnabled(true);
 		
-		//sigo deshabilitando los botones modificar y eliminar porque no hay una fila seleccionada.
-		btnModificar.setEnabled(false); //deshabilito botón modificar
-		btnEliminar.setEnabled(false);  //deshabilito botón eliminar
-		
 		//Habilito la Tabla para que pueda hacer click
 		tablaAlumnos.setEnabled(true);
-		
-		//Deshabilito el boton guardar 
-		btnGuardar.setEnabled(false);  
-		botonGuardarComoGuardar(); //por si estaba buscando cambio icono y texto del btnGuardar a "Guardar"
-		
-		//deshabilito el boton cancelar
-		btnCancelar.setEnabled(false);
-
+	
 		//deshabilito los campos para poder que no pueda editar
 		txtId.setEditable(false);
 		txtDni.setEditable(false);
 		txtApellido.setEditable(false);
 		txtNombre.setEditable(false);
-		jdcFechaNacimiento.setEnabled(false); //AVERIGUAR COMO HACER SETEDITABLE(FALSE), ASI NO QUEDA COLOR DISMINUIDO
-		checkboxEstado.setEnabled(false);	  //AVERIGUAR COMO HACER SETEDITABLE(FALSE), ASI NO QUEDA COLOR DISMINUIDO
+		
 	} //deshabilitoParaEditar
 
 	
@@ -209,8 +236,8 @@ public class GestionInscripciones extends javax.swing.JInternalFrame {
 		txtDni.setText("");
 		txtApellido.setText("");
 		txtNombre.setText("");
-		jdcFechaNacimiento.setDate(null);
-		checkboxEstado.setSelected(false);
+//		jdcFechaNacimiento.setDate(null);
+//		checkboxEstado.setSelected(false);
 		tablaAlumnos.removeRowSelectionInterval(0, tablaAlumnos.getRowCount()-1); //des-selecciono las filas de la tabla
 	} // limpiarCampos
 
@@ -225,10 +252,17 @@ public class GestionInscripciones extends javax.swing.JInternalFrame {
 		txtId.setText(tablaAlumnos.getValueAt(numfila, 0)+"");
 		txtDni.setText(tablaAlumnos.getValueAt(numfila, 1)+"");
 		txtApellido.setText((String)tablaAlumnos.getValueAt(numfila, 2));
-		txtNombre.setText((String)tablaAlumnos.getValueAt(numfila, 3));
-		jdcFechaNacimiento.setDate(Utils.localDate2Date((LocalDate)tablaAlumnos.getValueAt(numfila, 4)));
-		checkboxEstado.setSelected((Boolean)tablaAlumnos.getValueAt(numfila, 5));
+		txtNombre.setText((String)tablaAlumnos.getValueAt(numfila, 3));		
 	} //filaTabla2Campos
+        
+        
+        /**
+	 * cargo los datos de la fila indicada de la tabla a los campos de texto de la pantalla 
+	 * @param numfila el número de fila a cargar a los campos
+	 */
+	private int filaTabla2IdAlumno(int numfila){
+		return (Integer)tablaAlumnos.getValueAt(numfila, 0);			
+	} //filaTabla2IdAlumno
 
 
 	
@@ -237,50 +271,50 @@ public class GestionInscripciones extends javax.swing.JInternalFrame {
 	 * Cargo los campos de texto de la pantalla a un objeto tipo Alumno
 	 * @return El Alumno devuelto. Si hay algún error, devuelve null
 	 */
-	private Alumno campos2Alumno(){ 
-		int idAlumno, dni;
-		String apellido, nombre;
-		LocalDate fechaNacimiento;
-		boolean estado;
-		
-		//idAlumno
-		try {
-			if (txtId.getText().isEmpty()) // en el alta será un string vacío
-				idAlumno = -1;
-			else
-				idAlumno = Integer.valueOf(txtId.getText()); // obtengo el identificador el alumno
-		} catch (NumberFormatException e) {
-			JOptionPane.showMessageDialog(this, "El Id debe ser un número válido", "Id no válido", JOptionPane.ERROR_MESSAGE);
-			return null;
-		}
-		
-		//dni
-		try {
-			dni = Integer.valueOf(txtDni.getText());
-				
-		} catch (NumberFormatException e) {
-			JOptionPane.showMessageDialog(this, "El DNI debe ser un número válido", "DNI no válido", JOptionPane.ERROR_MESSAGE);
-			return null;
-		}
-		
-		//apellido y nombre
-		apellido = txtApellido.getText();
-		nombre = txtNombre.getText();
-		
-		//fechaNacimiento
-		if (jdcFechaNacimiento.getDate() != null)
-			fechaNacimiento = Utils.date2LocalDate(jdcFechaNacimiento.getDate());
-		else {
-			JOptionPane.showMessageDialog(this, "La fecha de nacimiento debe ser una fecha válida", "Nacimiento no válido", JOptionPane.ERROR_MESSAGE);
-			return null;
-		}
-		
-		//estado
-		estado = checkboxEstado.isSelected(); 
-		
-		return new Alumno(idAlumno, dni, apellido, nombre, fechaNacimiento, estado);
-	} // campos2Alumno
-	
+//	private Alumno campos2Alumno(){ 
+//		int idAlumno, dni;
+//		String apellido, nombre;
+//		LocalDate fechaNacimiento;
+//		boolean estado;
+//		
+//		//idAlumno
+//		try {
+//			if (txtId.getText().isEmpty()) // en el alta será un string vacío
+//				idAlumno = -1;
+//			else
+//				idAlumno = Integer.valueOf(txtId.getText()); // obtengo el identificador el alumno
+//		} catch (NumberFormatException e) {
+//			JOptionPane.showMessageDialog(this, "El Id debe ser un número válido", "Id no válido", JOptionPane.ERROR_MESSAGE);
+//			return null;
+//		}
+//		
+//		//dni
+//		try {
+//			dni = Integer.valueOf(txtDni.getText());
+//				
+//		} catch (NumberFormatException e) {
+//			JOptionPane.showMessageDialog(this, "El DNI debe ser un número válido", "DNI no válido", JOptionPane.ERROR_MESSAGE);
+//			return null;
+//		}
+//		
+//		//apellido y nombre
+//		apellido = txtApellido.getText();
+//		nombre = txtNombre.getText();
+//		
+////		//fechaNacimiento
+////		if (jdcFechaNacimiento.getDate() != null)
+////			fechaNacimiento = Utils.date2LocalDate(jdcFechaNacimiento.getDate());
+////		else {
+////			JOptionPane.showMessageDialog(this, "La fecha de nacimiento debe ser una fecha válida", "Nacimiento no válido", JOptionPane.ERROR_MESSAGE);
+////			return null;
+////		}
+////		
+////		//estado
+////		estado = checkboxEstado.isSelected(); 
+////		
+//		return new Alumno(idAlumno, dni, apellido, nombre, estado);
+//	} // campos2Alumno
+//	
 	
 	
 	
@@ -308,11 +342,11 @@ public class GestionInscripciones extends javax.swing.JInternalFrame {
         btnResetearFiltro = new javax.swing.JButton();
         panelTablaMateriasInscriptas = new javax.swing.JPanel();
         jScrollPane2 = new javax.swing.JScrollPane();
-        tablaMaterias = new javax.swing.JTable();
+        tablaMateriasInscriptas = new javax.swing.JTable();
         lblTituloTabla1 = new javax.swing.JLabel();
         panelTablaMateriasDisponibles = new javax.swing.JPanel();
         jScrollPane3 = new javax.swing.JScrollPane();
-        tablaMaterias1 = new javax.swing.JTable();
+        tablaMateriasDisponibles = new javax.swing.JTable();
         lblTituloTabla2 = new javax.swing.JLabel();
         btnInscribirse = new javax.swing.JButton();
         btnDesinscribirse = new javax.swing.JButton();
@@ -329,6 +363,7 @@ public class GestionInscripciones extends javax.swing.JInternalFrame {
         btnBuscar.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         btnBuscar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/lupa32x32.png"))); // NOI18N
         btnBuscar.setText("Buscar");
+        btnBuscar.setEnabled(false);
         btnBuscar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnBuscarActionPerformed(evt);
@@ -496,7 +531,7 @@ public class GestionInscripciones extends javax.swing.JInternalFrame {
 
         panelTablaMateriasInscriptas.setBackground(new java.awt.Color(153, 153, 255));
 
-        tablaMaterias.setModel(new javax.swing.table.DefaultTableModel(
+        tablaMateriasInscriptas.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
 
             },
@@ -519,13 +554,13 @@ public class GestionInscripciones extends javax.swing.JInternalFrame {
                 return canEdit [columnIndex];
             }
         });
-        tablaMaterias.getTableHeader().setReorderingAllowed(false);
-        tablaMaterias.addMouseListener(new java.awt.event.MouseAdapter() {
+        tablaMateriasInscriptas.getTableHeader().setReorderingAllowed(false);
+        tablaMateriasInscriptas.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
-                tablaMateriasMouseClicked(evt);
+                tablaMateriasInscriptasMouseClicked(evt);
             }
         });
-        jScrollPane2.setViewportView(tablaMaterias);
+        jScrollPane2.setViewportView(tablaMateriasInscriptas);
 
         lblTituloTabla1.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
         lblTituloTabla1.setText("Materias en curso");
@@ -559,7 +594,7 @@ public class GestionInscripciones extends javax.swing.JInternalFrame {
 
         panelTablaMateriasDisponibles.setBackground(new java.awt.Color(153, 153, 255));
 
-        tablaMaterias1.setModel(new javax.swing.table.DefaultTableModel(
+        tablaMateriasDisponibles.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
 
             },
@@ -582,13 +617,13 @@ public class GestionInscripciones extends javax.swing.JInternalFrame {
                 return canEdit [columnIndex];
             }
         });
-        tablaMaterias1.getTableHeader().setReorderingAllowed(false);
-        tablaMaterias1.addMouseListener(new java.awt.event.MouseAdapter() {
+        tablaMateriasDisponibles.getTableHeader().setReorderingAllowed(false);
+        tablaMateriasDisponibles.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
-                tablaMaterias1MouseClicked(evt);
+                tablaMateriasDisponiblesMouseClicked(evt);
             }
         });
-        jScrollPane3.setViewportView(tablaMaterias1);
+        jScrollPane3.setViewportView(tablaMateriasDisponibles);
 
         lblTituloTabla2.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
         lblTituloTabla2.setText("Materias disponibles");
@@ -638,23 +673,19 @@ public class GestionInscripciones extends javax.swing.JInternalFrame {
                 btnDesinscribirseActionPerformed(evt);
             }
         });
-        getContentPane().add(btnDesinscribirse, new org.netbeans.lib.awtextra.AbsoluteConstraints(870, 180, -1, -1));
+        getContentPane().add(btnDesinscribirse, new org.netbeans.lib.awtextra.AbsoluteConstraints(860, 180, -1, -1));
 
         campos.setBackground(new java.awt.Color(153, 153, 255));
 
-        txtId.setEditable(false);
         txtId.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         txtId.setBorder(javax.swing.BorderFactory.createTitledBorder("Id"));
 
-        txtDni.setEditable(false);
         txtDni.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         txtDni.setBorder(javax.swing.BorderFactory.createTitledBorder("DNI"));
 
-        txtNombre.setEditable(false);
         txtNombre.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         txtNombre.setBorder(javax.swing.BorderFactory.createTitledBorder("Nombre"));
 
-        txtApellido.setEditable(false);
         txtApellido.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         txtApellido.setBorder(javax.swing.BorderFactory.createTitledBorder("Apellido"));
 
@@ -692,7 +723,7 @@ public class GestionInscripciones extends javax.swing.JInternalFrame {
 
     private void btnBuscarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBuscarActionPerformed
         limpiarCampos();
-        botonGuardarComoBuscar(); //cambio icono y texto del btnGuardar a "Buscar"
+//        botonGuardarComoBuscar(); //cambio icono y texto del btnGuardar a "Buscar"
         habilitoParaBuscar();
     }//GEN-LAST:event_btnBuscarActionPerformed
 
@@ -701,18 +732,18 @@ public class GestionInscripciones extends javax.swing.JInternalFrame {
     }//GEN-LAST:event_btnSalirActionPerformed
 
     private void cboxOrdenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cboxOrdenActionPerformed
-        if (cboxOrden.getSelectedIndex() == 0)
-        ordenacion = Ordenacion.PORIDALUMNO;
-        else if (cboxOrden.getSelectedIndex() == 1)
-        ordenacion = Ordenacion.PORDNI;
-        else if (cboxOrden.getSelectedIndex() == 2)
-        ordenacion = Ordenacion.PORAPYNO;
-        else // por las dudas que no eligio uno correcto
-        ordenacion = OrdenacionbtnInscribirse     cargarListaAlumnos();
-        cargarTabla();
-        limpiarCampos();
-        botonGuardarComoGuardar();
-        deshabilitoParaEditar();
+//        if (cboxOrden.getSelectedIndex() == 0)
+//        ordenacion = Ordenacion.PORIDALUMNO;
+//        else if (cboxOrden.getSelectedIndex() == 1)
+//        ordenacion = Ordenacion.PORDNI;
+//        else if (cboxOrden.getSelectedIndex() == 2)
+//        ordenacion = Ordenacion.PORAPYNO;
+//        else // por las dudas que no eligio uno correcto
+//        ordenacion = OrdenacionbtnInscribirse     cargarListaAlumnos();
+//        cargarTabla();
+//        limpiarCampos();
+//        botonGuardarComoGuardar();
+//        deshabilitoParaEditar();
     }//GEN-LAST:event_cboxOrdenActionPerformed
 
     private void cboxOrdenPropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_cboxOrdenPropertyChange
@@ -725,9 +756,10 @@ public class GestionInscripciones extends javax.swing.JInternalFrame {
         }
         int numfila = tablaAlumnos.getSelectedRow();
         if (numfila != -1) {
-            btnEliminar.setEnabled(true); // habilito el botón de eliminar
-            btnModificar.setEnabled(true); // habilito el botón de modificar
-
+            
+            //mostramos las tablas de materias de acuerdo al alumno seleccionado
+            
+            
             filaTabla2Campos(numfila); // cargo los campos de texto de la pantalla con datos de la fila seccionada de la tabla
         }
     }//GEN-LAST:event_tablaAlumnosMouseClicked
@@ -737,35 +769,34 @@ public class GestionInscripciones extends javax.swing.JInternalFrame {
         cargarListaAlumnos();
         cargarTabla();
         limpiarCampos();
-        botonGuardarComoGuardar();//por si estaba buscando cambio icono y texto del btnGuardar a "Guardar"
         deshabilitoParaEditar();
     }//GEN-LAST:event_btnResetearFiltroActionPerformed
 
-    private void tablaMateriasMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tablaMateriasMouseClicked
+    private void tablaMateriasInscriptasMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tablaMateriasInscriptasMouseClicked
         //tabla.addRowSelectionInterval(filaTabla, filaTabla); //selecciono esa fila de la tabla
-        if (tablaMaterias.getSelectedRow() != -1){ // si hay alguna fila seleccionada
+        if (tablaMateriasInscriptas.getSelectedRow() != -1){ // si hay alguna fila seleccionada
         }
-        int numfila = tablaMaterias.getSelectedRow();
+        int numfila = tablaMateriasInscriptas.getSelectedRow();
         if (numfila != -1) {
-            btnEliminar.setEnabled(true); // habilito el botón de eliminar
-            btnModificar.setEnabled(true); // habilito el botón de modificar
+//            btnEliminar.setEnabled(true); // habilito el botón de eliminar
+//            btnModificar.setEnabled(true); // habilito el botón de modificar
 
             filaTabla2Campos(numfila); // cargo los campos de texto de la pantalla con datos de la fila seccionada de la tabla
         }
-    }//GEN-LAST:event_tablaMateriasMouseClicked
+    }//GEN-LAST:event_tablaMateriasInscriptasMouseClicked
 
     private void btnDesinscribirseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDesinscribirseActionPerformed
-        resetearFiltro();
-        cargarListaMaterias();
-        cargarTabla();
-        limpiarCampos();
-        botonGuardarComoGuardar();//por si estaba buscando cambio icono y texto del btnGuardar a "Guardar"
-        deshabilitoParaEditar();
+//        resetearFiltro();
+//        cargarListaMaterias();
+//        cargarTabla();
+//        limpiarCampos();
+//        botonGuardarComoGuardar();//por si estaba buscando cambio icono y texto del btnGuardar a "Guardar"
+//        deshabilitoParaEditar();
     }//GEN-LAST:event_btnDesinscribirseActionPerformed
 
-    private void tablaMaterias1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tablaMaterias1MouseClicked
+    private void tablaMateriasDisponiblesMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tablaMateriasDisponiblesMouseClicked
         // TODO add your handling code here:
-    }//GEN-LAST:event_tablaMaterias1MouseClicked
+    }//GEN-LAST:event_tablaMateriasDisponiblesMouseClicked
 
     private void btnInscribirseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnInscribirseActionPerformed
         // TODO add your handling code here:
@@ -773,29 +804,31 @@ public class GestionInscripciones extends javax.swing.JInternalFrame {
 
     private void btnBuscar2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBuscar2ActionPerformed
 
-        if ( tipoEdicion == TipoEdicion.AGREGAR ){ //agregar el alumno
-            agregarAlumno();
-            resetearFiltro();
-        } else if ( tipoEdicion == TipoEdicion.MODIFICAR ) { // modificar el alumno
-            modificarAlumno();
-            resetearFiltro();
-        } else { // tipoEdicion = BUSCAR: quiere buscar un alumno
-            buscarAlumno();
-            setearFiltro();
-        }
+//        if ( tipoEdicion == TipoEdicion.AGREGAR ){ //agregar el alumno
+//            agregarAlumno();
+//            resetearFiltro();
+//        } else if ( tipoEdicion == TipoEdicion.MODIFICAR ) { // modificar el alumno
+//            modificarAlumno();
+//            resetearFiltro();
+//        } else { // tipoEdicion = BUSCAR: quiere buscar un alumno
+//            buscarAlumno();
+//            setearFiltro();
+//        }
 
-        limpiarCampos();
-        botonGuardarComoGuardar();//por si estaba buscando cambio icono y texto del btnGuardar a "Guardar"
-        deshabilitoParaEditar();
+//        limpiarCampos();
+//        botonGuardarComoGuardar();//por si estaba buscando cambio icono y texto del btnGuardar a "Guardar"
+//        deshabilitoParaEditar();
     }//GEN-LAST:event_btnBuscar2ActionPerformed
 
     private void btnCancelarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelarActionPerformed
         limpiarCampos();
-        botonGuardarComoGuardar(); //por si estaba buscando cambio icono y texto del btnGuardar a "Guardar"
-        deshabilitoParaEditar();
+//        botonGuardarComoGuardar(); //por si estaba buscando cambio icono y texto del btnGuardar a "Guardar"
+//        deshabilitoParaEditar();
 
     }//GEN-LAST:event_btnCancelarActionPerformed
 
+    
+   
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel botonera;
@@ -819,11 +852,12 @@ public class GestionInscripciones extends javax.swing.JInternalFrame {
     private javax.swing.JPanel panelTablaMateriasDisponibles;
     private javax.swing.JPanel panelTablaMateriasInscriptas;
     private javax.swing.JTable tablaAlumnos;
-    private javax.swing.JTable tablaMaterias;
-    private javax.swing.JTable tablaMaterias1;
+    private javax.swing.JTable tablaMateriasDisponibles;
+    private javax.swing.JTable tablaMateriasInscriptas;
     private javax.swing.JTextField txtApellido;
     private javax.swing.JTextField txtDni;
     private javax.swing.JTextField txtId;
     private javax.swing.JTextField txtNombre;
     // End of variables declaration//GEN-END:variables
 }
+
