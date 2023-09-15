@@ -9,6 +9,7 @@ import accesoadatos.Utils;
 import entidades.Alumno;
 import entidades.Inscripcion;
 import entidades.Materia;
+import java.awt.Color;
 import java.time.LocalDate;
 import java.util.List;
 import javax.swing.JOptionPane;
@@ -21,11 +22,11 @@ import javax.swing.table.DefaultTableModel;
 public class GestionInscripciones extends javax.swing.JInternalFrame {
 	DefaultTableModel modeloTablaAlumnos, modeloTablaMateriasInscriptas, modeloTablaMateriasDisponibles;
 	public static List<Alumno> listaAlumnos;
-        public static List<Inscripcion> listaInscripcionesDelAlumno;
-        public static List<Inscripcion> listaMateriasDisponibles;
+    public static List<Materia> listaMateriasInscriptas; //lista de materias en la que está inscripto un alumno
+    public static List<Materia> listaMateriasDisponibles;//lista de materias en las que NO está inscripto un alumno
 	private final AlumnoData alumnoData;	
-        private final MateriaData materiaData;
-        private final InscripcionData inscripcionData;
+    private final MateriaData materiaData;
+    private final InscripcionData inscripcionData;
 	// private enum TipoEdicion {AGREGAR, MODIFICAR, BUSCAR};
 	private Ordenacion ordenacion = Ordenacion.PORIDALUMNO; // defino el tipo de orden por defecto 
 	private Filtro filtro = new Filtro();  //el filtro de búsqueda
@@ -37,23 +38,23 @@ public class GestionInscripciones extends javax.swing.JInternalFrame {
 	public GestionInscripciones() {
 		initComponents();
 		alumnoData = new AlumnoData();
-                materiaData = new MateriaData();
-                inscripcionData = new InscripcionData();
-                modeloTablaAlumnos = (DefaultTableModel) tablaAlumnos.getModel();
-                modeloTablaMateriasInscriptas = (DefaultTableModel) tablaMateriasInscriptas.getModel();
-                modeloTablaMateriasDisponibles = (DefaultTableModel) tablaMateriasDisponibles.getModel();
+		materiaData = new MateriaData();
+        inscripcionData = new InscripcionData();
+        modeloTablaAlumnos = (DefaultTableModel) tablaAlumnos.getModel();
+        modeloTablaMateriasInscriptas = (DefaultTableModel) tablaMateriasInscriptas.getModel();
+        modeloTablaMateriasDisponibles = (DefaultTableModel) tablaMateriasDisponibles.getModel();
                 
 		cargarListaAlumnos(); //carga la base de datos
 		cargarTablaAlumnos(); // cargo la tabla con los alumnos
 	} // constructor
 
-		/** carga la lista de alumnos de la BD */
+	/** carga la lista de alumnos de la BD */
 	private void cargarListaAlumnos(){ 
 		if (filtro.estoyFiltrando) 
 			listaAlumnos = alumnoData.getListaAlumnosXCriterioDeBusqueda(filtro.id, filtro.dni, filtro.apellido, filtro.nombre, ordenacion);
 		else
 			listaAlumnos = alumnoData.getListaAlumnos(ordenacion);
-	}
+	}//cargarListaAlumnos
 	
 	
 	/** carga alumnos de la lista a la tabla */
@@ -78,36 +79,91 @@ public class GestionInscripciones extends javax.swing.JInternalFrame {
 		if (tablaAlumnos.getSelectedRow() == -1) {// si no hay alguna fila seleccionada
 			btnInscribirse.setEnabled(false); // deshabilito el botón de Inscribir
 			btnDesinscribirse.setEnabled(false); // deshabilito el botón de Desinscribir
-                        borrarTablaMaterias();
-                       
+			borrarTablaMaterias();   
 		}else {//hay una fila seleccionada, cargamos y mostramos las tablas de materias inscriptas y disponibles.
-                    cargarListaMaterias(filaTabla2IdAlumno(tablaAlumnos.getSelectedRow()));
-                }
+			cargarListaMaterias(filaTablaAlumnos2IdAlumno(tablaAlumnos.getSelectedRow()));
+			cargarTablaMaterias();
+        }
 	} //cargarTablaAlumnos
 	
 	
-        /**
-         * En base al idAlumno que nos pasan, cargamos la lista de materias 
-         * inscriptas y disponibles de ese alumno.
-         * @param idAlumno 
-         */
-        private void cargarListaMaterias(int idAlumno){
-            listaInscripciones = InscripcionData
-        }// cargarListaMaterias
+	
+	
+	/**Carga listaMateriasInscriptas a la tablaMateriasInscriptas y 
+	 * listaMateriasDisponibles a la tablaMateriasDisponibles
+	 */
+	private void cargarTablaMaterias(){
+		//borro las filas de la tablaMateriasInscriptas
+		for (int fila = modeloTablaMateriasInscriptas.getRowCount() -  1; fila >= 0; fila--)
+			modeloTablaMateriasInscriptas.removeRow(fila);
+		
+		//borro las filas de la tablaMateriasDisponibles
+		for (int fila = modeloTablaMateriasDisponibles.getRowCount() -  1; fila >= 0; fila--)
+			modeloTablaMateriasDisponibles.removeRow(fila);
+		
+		//cargo las materias  de listaMateriasInscriptas a la tablaMateriasInscriptas
+		for (Materia materia : listaMateriasInscriptas) {
+			modeloTablaMateriasInscriptas.addRow(new Object[] {
+				materia.getIdmateria(),
+				materia.getAnio(),
+				materia.getNombre(),
+				materia.getEstado() } 
+			);
+		}
+	
+		//cargo las materias  de listaMateriasDisponibles a la tablaMateriasDisponibles
+		for (Materia materia : listaMateriasDisponibles) {
+			modeloTablaMateriasDisponibles.addRow(new Object[] {
+				materia.getIdmateria(),
+				materia.getAnio(),
+				materia.getNombre(),
+				materia.getEstado() } 
+			);
+		}
+
+		//como no hay fila seleccionada en la tablaMateriasInscriptas, deshabilito el botón Desinscribirse
+		if (tablaMateriasInscriptas.getSelectedRow() == -1) // si no hay alguna fila seleccionada
+			btnDesinscribirse.setEnabled(false); // deshabilito el botón de Desinscribir
+		else //hay una fila seleccionada
+			btnDesinscribirse.setEnabled(true); // deshabilito el botón de Desinscribir
         
+		//como no hay fila seleccionada tablaMateriasDisponibles, deshabilito el botón Inscribirse
+		if (tablaMateriasDisponibles.getSelectedRow() == -1) // si no hay alguna fila seleccionada
+			btnInscribirse.setEnabled(false); // deshabilito el botón de Inscribirse
+		else //hay una fila seleccionada
+			btnInscribirse.setEnabled(true); // deshabilito el botón de Inscribirse
+	}//cargarTablaMaterias
+	
+	
+	
+	
+	/**
+	 * En base al idAlumno que nos pasan, cargamos la lista de materias 
+	 * inscriptas y disponibles de ese alumno.
+	 * @param idAlumno 
+	 */
+	private void cargarListaMaterias(int idAlumno){
+		listaMateriasInscriptas = inscripcionData.getListaMateriasXAlumno(idAlumno);
+		listaMateriasDisponibles = inscripcionData.getListaMateriasDisponiblesXAlumno(idAlumno);
+	}// cargarListaMaterias
+
         
-        /**
-         * como no hay ningun alumno seleccionado, borra los datos de las tablas de materias.
-         */
-        private void borrarTablaMaterias(){
-            //borro las filas de la tabla de materias inscriptas
-            for (int fila = modeloTablaMateriasInscriptas.getRowCount() -  1; fila >= 0; fila--)
-		modeloTablaMateriasInscriptas.removeRow(fila);
-            //borro las filas de la tabla de materias disponibles
-            for (int fila = modeloTablaMateriasDisponibles.getRowCount() -  1; fila >= 0; fila--)
-		modeloTablaMateriasDisponibles.removeRow(fila);
-        }// borrarTablaMaterias
-        
+		
+		
+	/**
+	 * como no hay ningun alumno seleccionado, borra los datos de las tablas de materias.
+	 */
+	private void borrarTablaMaterias(){
+		//borro las filas de la tabla de materias inscriptas
+		for (int fila = modeloTablaMateriasInscriptas.getRowCount() -  1; fila >= 0; fila--)
+	modeloTablaMateriasInscriptas.removeRow(fila);
+		//borro las filas de la tabla de materias disponibles
+		for (int fila = modeloTablaMateriasDisponibles.getRowCount() -  1; fila >= 0; fila--)
+	modeloTablaMateriasDisponibles.removeRow(fila);
+	}// borrarTablaMaterias
+
+		
+		
 	
 	/**
 	 * Busca al alumno por id, por dni, por apellido o por nombre (o por 
@@ -134,6 +190,7 @@ public class GestionInscripciones extends javax.swing.JInternalFrame {
 			JOptionPane.showMessageDialog(this, "El Id debe ser un número válido", "Id no válido", JOptionPane.ERROR_MESSAGE);
 			return false;
 		}
+		
 		//dni
 		try {
 			if (txtDni.getText().isEmpty()) // si está vacío no se usa para buscar
@@ -166,17 +223,14 @@ public class GestionInscripciones extends javax.swing.JInternalFrame {
 		}
 	} //buscarAlumno
 	
-
+	
 	
 	
 	
 	/** habilito boton buscar cuando alguno de los campos tenga datos*/
 	private void habilitoParaBuscar(){ 
-		
-                if (txtId.getText()!=null || txtDni.getText()!= null || txtApellido.getText() != null || txtNombre.getText() != null){
-                    btnBuscar.setEnabled(true);
-                }
-		
+		if (txtId.getText()!=null || txtDni.getText()!= null || txtApellido.getText() != null || txtNombre.getText() != null)
+			btnBuscar.setEnabled(true);
 	} //habilitoParaBuscar
 
 	
@@ -236,9 +290,7 @@ public class GestionInscripciones extends javax.swing.JInternalFrame {
 		txtDni.setText("");
 		txtApellido.setText("");
 		txtNombre.setText("");
-//		jdcFechaNacimiento.setDate(null);
-//		checkboxEstado.setSelected(false);
-		tablaAlumnos.removeRowSelectionInterval(0, tablaAlumnos.getRowCount()-1); //des-selecciono las filas de la tabla
+		// tablaAlumnos.removeRowSelectionInterval(0, tablaAlumnos.getRowCount()-1); //des-selecciono las filas de la tabla
 	} // limpiarCampos
 
 
@@ -256,15 +308,33 @@ public class GestionInscripciones extends javax.swing.JInternalFrame {
 	} //filaTabla2Campos
         
         
-        /**
-	 * cargo los datos de la fila indicada de la tabla a los campos de texto de la pantalla 
+    /**
+	 * Devuelve el idAlumno de la fila seleccionada de la tabla de alumnos
 	 * @param numfila el número de fila a cargar a los campos
 	 */
-	private int filaTabla2IdAlumno(int numfila){
+	private int filaTablaAlumnos2IdAlumno(int numfila){
 		return (Integer)tablaAlumnos.getValueAt(numfila, 0);			
 	} //filaTabla2IdAlumno
 
 
+    /**
+	 * Devuelve el idMateria de la fila seleccionada de la tabla de disponibles
+	 * @param numfila el número de fila a cargar a los campos
+	 */
+	private int filaTablaDisponibles2IdMateria(int numfila){
+		return (Integer)tablaMateriasDisponibles.getValueAt(numfila, 0);			
+	} //filaTablaDisponibles2IdMateria
+	
+	
+	
+	/**
+	 * Devuelve el idMateria de la fila seleccionada de la tabla de inscriptos
+	 * @param numfila el número de fila a cargar a los campos
+	 */
+	private int filaTablaInscriptas2IdMateria(int numfila){
+		return (Integer)tablaMateriasInscriptas.getValueAt(numfila, 0);			
+	} //filaTablaInscriptas2IdMateria
+	
 	
 	
 	/**
@@ -316,6 +386,41 @@ public class GestionInscripciones extends javax.swing.JInternalFrame {
 //	} // campos2Alumno
 //	
 	
+
+	/** 
+	 * cambia titulo y color de panel de tabla de alumnos para reflejar que 
+	 * está filtrada. Habilita btnResetearFiltro
+	*/
+	private void setearFiltro(){
+			//cambio el titulo de la tabla y color panel de tabla de Alumnos para que muestre que está filtrado
+			lblTituloTablaAlumnos.setText("Listado de alumnos filtrado por búsqueda");
+			panelTablaAlumnos.setBackground(new Color(255, 51, 51));
+			btnResetearFiltro.setEnabled(true);
+			filtro.estoyFiltrando = true;
+	} //setearFiltro
+	
+	
+	/** 
+	 * Restaur titulo y color de panel de tablaAlumnos para reflejar que 
+	 * ya no está filtrada. Deshabilita btnResetearFiltro
+	*/
+	private void resetearFiltro(){
+			//cambio el titulo de la tabla y color panel de tabla para que muestre que no está filtrado
+			//cambio el titulo de la tabla y color panel de tabla para que muestre que está filtrado
+			lblTituloTablaAlumnos.setText("Listado de alumnos");
+			panelTablaAlumnos.setBackground(new Color(153, 153, 255));
+			btnResetearFiltro.setEnabled(false);
+			filtro.estoyFiltrando = false;
+	} //setearFiltro
+	
+	
+	
+	
+	
+	
+/*=====================================================================================================================*/	
+
+
 	
 	
 	
@@ -338,7 +443,7 @@ public class GestionInscripciones extends javax.swing.JInternalFrame {
         panelTablaAlumnos = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
         tablaAlumnos = new javax.swing.JTable();
-        lblTituloTabla = new javax.swing.JLabel();
+        lblTituloTablaAlumnos = new javax.swing.JLabel();
         btnResetearFiltro = new javax.swing.JButton();
         panelTablaMateriasInscriptas = new javax.swing.JPanel();
         jScrollPane2 = new javax.swing.JScrollPane();
@@ -383,11 +488,6 @@ public class GestionInscripciones extends javax.swing.JInternalFrame {
         cboxOrden.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 cboxOrdenActionPerformed(evt);
-            }
-        });
-        cboxOrden.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
-            public void propertyChange(java.beans.PropertyChangeEvent evt) {
-                cboxOrdenPropertyChange(evt);
             }
         });
 
@@ -487,9 +587,9 @@ public class GestionInscripciones extends javax.swing.JInternalFrame {
         });
         jScrollPane1.setViewportView(tablaAlumnos);
 
-        lblTituloTabla.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
-        lblTituloTabla.setText("Listado de Alumnos");
-        lblTituloTabla.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        lblTituloTablaAlumnos.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
+        lblTituloTablaAlumnos.setText("Listado de Alumnos");
+        lblTituloTablaAlumnos.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
 
         btnResetearFiltro.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         btnResetearFiltro.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/restart16x16.png"))); // NOI18N
@@ -511,7 +611,7 @@ public class GestionInscripciones extends javax.swing.JInternalFrame {
                     .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 605, Short.MAX_VALUE)
                     .addGroup(panelTablaAlumnosLayout.createSequentialGroup()
                         .addGap(8, 8, 8)
-                        .addComponent(lblTituloTabla, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(lblTituloTablaAlumnos, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(btnResetearFiltro)))
                 .addContainerGap())
@@ -521,7 +621,7 @@ public class GestionInscripciones extends javax.swing.JInternalFrame {
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelTablaAlumnosLayout.createSequentialGroup()
                 .addGroup(panelTablaAlumnosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(btnResetearFiltro)
-                    .addComponent(lblTituloTabla))
+                    .addComponent(lblTituloTablaAlumnos))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 282, Short.MAX_VALUE)
                 .addContainerGap())
@@ -658,6 +758,7 @@ public class GestionInscripciones extends javax.swing.JInternalFrame {
         btnInscribirse.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         btnInscribirse.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/flecha_arriba16x16.png"))); // NOI18N
         btnInscribirse.setText("Inscribirse");
+        btnInscribirse.setEnabled(false);
         btnInscribirse.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnInscribirseActionPerformed(evt);
@@ -668,6 +769,7 @@ public class GestionInscripciones extends javax.swing.JInternalFrame {
         btnDesinscribirse.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         btnDesinscribirse.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/flecha_abajo16x16.png"))); // NOI18N
         btnDesinscribirse.setText("Desinscribirse");
+        btnDesinscribirse.setEnabled(false);
         btnDesinscribirse.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnDesinscribirseActionPerformed(evt);
@@ -721,87 +823,146 @@ public class GestionInscripciones extends javax.swing.JInternalFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+	
+	
+	
     private void btnBuscarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBuscarActionPerformed
         limpiarCampos();
 //        botonGuardarComoBuscar(); //cambio icono y texto del btnGuardar a "Buscar"
         habilitoParaBuscar();
     }//GEN-LAST:event_btnBuscarActionPerformed
 
+	
+	
+	
     private void btnSalirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSalirActionPerformed
         dispose();//cierra la ventana
     }//GEN-LAST:event_btnSalirActionPerformed
 
+	
+	
+	
     private void cboxOrdenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cboxOrdenActionPerformed
-//        if (cboxOrden.getSelectedIndex() == 0)
-//        ordenacion = Ordenacion.PORIDALUMNO;
-//        else if (cboxOrden.getSelectedIndex() == 1)
-//        ordenacion = Ordenacion.PORDNI;
-//        else if (cboxOrden.getSelectedIndex() == 2)
-//        ordenacion = Ordenacion.PORAPYNO;
-//        else // por las dudas que no eligio uno correcto
-//        ordenacion = OrdenacionbtnInscribirse     cargarListaAlumnos();
-//        cargarTabla();
-//        limpiarCampos();
-//        botonGuardarComoGuardar();
-//        deshabilitoParaEditar();
+        if (cboxOrden.getSelectedIndex() == 0)
+			ordenacion = Ordenacion.PORIDALUMNO;
+        else if (cboxOrden.getSelectedIndex() == 1)
+			ordenacion = Ordenacion.PORDNI;
+        else if (cboxOrden.getSelectedIndex() == 2)
+			ordenacion = Ordenacion.PORAPYNO;
+        else // por las dudas que no eligio uno correcto
+			ordenacion = Ordenacion.PORIDALUMNO;
+		
+		cargarListaAlumnos();
+        cargarTablaAlumnos();
     }//GEN-LAST:event_cboxOrdenActionPerformed
 
-    private void cboxOrdenPropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_cboxOrdenPropertyChange
-        System.out.println("Cambio property de cboxOrden");
-    }//GEN-LAST:event_cboxOrdenPropertyChange
-
+	
+	
+	
     private void tablaAlumnosMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tablaAlumnosMouseClicked
         //tabla.addRowSelectionInterval(filaTabla, filaTabla); //selecciono esa fila de la tabla
         if (tablaAlumnos.getSelectedRow() != -1){ // si hay alguna fila seleccionada
+			borrarTablaMaterias();
         }
         int numfila = tablaAlumnos.getSelectedRow();
         if (numfila != -1) {
             
             //mostramos las tablas de materias de acuerdo al alumno seleccionado
-            
-            
-            filaTabla2Campos(numfila); // cargo los campos de texto de la pantalla con datos de la fila seccionada de la tabla
+            int idAlumno = filaTablaAlumnos2IdAlumno(numfila); // saco el idAlumno de la fila seleccionadad de la tablaAlumnos
+			cargarListaMaterias(idAlumno);  // cargamos las listas de materias inscriptas y disponibles de ese alumno
+			cargarTablaMaterias();			// las mostramos en las respectivas tablas
         }
     }//GEN-LAST:event_tablaAlumnosMouseClicked
 
+	
+	
+	
     private void btnResetearFiltroActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnResetearFiltroActionPerformed
         resetearFiltro();
         cargarListaAlumnos();
-        cargarTabla();
+        cargarTablaAlumnos();
         limpiarCampos();
-        deshabilitoParaEditar();
     }//GEN-LAST:event_btnResetearFiltroActionPerformed
 
+	
+	
+	
+	
     private void tablaMateriasInscriptasMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tablaMateriasInscriptasMouseClicked
-        //tabla.addRowSelectionInterval(filaTabla, filaTabla); //selecciono esa fila de la tabla
         if (tablaMateriasInscriptas.getSelectedRow() != -1){ // si hay alguna fila seleccionada
+			btnDesinscribirse.setEnabled(false); // deshabilito botón Desinscribirse.
         }
         int numfila = tablaMateriasInscriptas.getSelectedRow();
-        if (numfila != -1) {
-//            btnEliminar.setEnabled(true); // habilito el botón de eliminar
-//            btnModificar.setEnabled(true); // habilito el botón de modificar
-
-            filaTabla2Campos(numfila); // cargo los campos de texto de la pantalla con datos de la fila seccionada de la tabla
-        }
+        if (numfila != -1) { //si hay alguna fila seleccionada en la tabla de materias disponibles
+			btnDesinscribirse.setEnabled(true);
+        } 
     }//GEN-LAST:event_tablaMateriasInscriptasMouseClicked
 
     private void btnDesinscribirseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDesinscribirseActionPerformed
-//        resetearFiltro();
-//        cargarListaMaterias();
-//        cargarTabla();
-//        limpiarCampos();
-//        botonGuardarComoGuardar();//por si estaba buscando cambio icono y texto del btnGuardar a "Guardar"
-//        deshabilitoParaEditar();
+		if (tablaMateriasInscriptas.getSelectedRow() != -1){ // si hay alguna fila seleccionada
+			btnDesinscribirse.setEnabled(false); // deshabilito botón Desinscribirse.
+        }
+        int numfilaInsc = tablaMateriasInscriptas.getSelectedRow();
+        if (numfilaInsc != -1) { //si hay alguna fila seleccionada en la tabla de materias disponibles
+			int idMateria = filaTablaInscriptas2IdMateria(numfilaInsc);//averiguamos el idMateria
+			
+		    int numfilaAlumno = tablaAlumnos.getSelectedRow();
+			if (numfilaAlumno != -1) {
+				int idAlumno = filaTablaAlumnos2IdAlumno(numfilaAlumno);
+				inscripcionData.bajaInscripcion(idAlumno, idMateria); // Lo inscribimos
+				
+				//actualizamos las listas y tablas de materias
+				cargarListaMaterias(idAlumno);
+				cargarTablaMaterias();
+         	}
+		}
     }//GEN-LAST:event_btnDesinscribirseActionPerformed
 
+	
+	
+	
+	
     private void tablaMateriasDisponiblesMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tablaMateriasDisponiblesMouseClicked
-        // TODO add your handling code here:
+        //tabla.addRowSelectionInterval(filaTabla, filaTabla); //selecciono esa fila de la tabla
+        if (tablaMateriasDisponibles.getSelectedRow() != -1){ // si hay alguna fila seleccionada
+			btnInscribirse.setEnabled(false); // deshabilito botón Inscribirse.
+        }
+        int numfila = tablaMateriasDisponibles.getSelectedRow();
+        if (numfila != -1) { //si hay alguna fila seleccionada en la tabla de materias disponibles
+			btnInscribirse.setEnabled(true);
+        } 	
     }//GEN-LAST:event_tablaMateriasDisponiblesMouseClicked
 
+	
+	
+	
+	
+	
     private void btnInscribirseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnInscribirseActionPerformed
-        // TODO add your handling code here:
+        if (tablaMateriasDisponibles.getSelectedRow() != -1){ // si hay alguna fila seleccionada
+			btnInscribirse.setEnabled(false); // deshabilito botón Inscribirse.
+        }
+        int numfilaDisp = tablaMateriasDisponibles.getSelectedRow();
+        if (numfilaDisp != -1) { //si hay alguna fila seleccionada en la tabla de materias disponibles
+			int idMateria = filaTablaDisponibles2IdMateria(numfilaDisp);//averiguamos el idMateria
+			
+		    int numfilaAlumno = tablaAlumnos.getSelectedRow();
+			if (numfilaAlumno != -1) {
+				int idAlumno = filaTablaAlumnos2IdAlumno(numfilaAlumno);
+				inscripcionData.altaInscripcion(0.0, idAlumno, idMateria); // Lo inscribimos
+				
+				//actualizamos las listas y tablas de materias
+				cargarListaMaterias(idAlumno);
+				cargarTablaMaterias();
+         	}
+		}
     }//GEN-LAST:event_btnInscribirseActionPerformed
 
+	
+	
+	
+	
+	
     private void btnBuscar2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBuscar2ActionPerformed
 
 //        if ( tipoEdicion == TipoEdicion.AGREGAR ){ //agregar el alumno
@@ -845,9 +1006,9 @@ public class GestionInscripciones extends javax.swing.JInternalFrame {
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
-    private javax.swing.JLabel lblTituloTabla;
     private javax.swing.JLabel lblTituloTabla1;
     private javax.swing.JLabel lblTituloTabla2;
+    private javax.swing.JLabel lblTituloTablaAlumnos;
     private javax.swing.JPanel panelTablaAlumnos;
     private javax.swing.JPanel panelTablaMateriasDisponibles;
     private javax.swing.JPanel panelTablaMateriasInscriptas;

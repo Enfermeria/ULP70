@@ -111,7 +111,8 @@ public class Login extends javax.swing.JFrame {
                // System.out.println("Acceso a Gestion de Alumnos");
                 PantallaPpal pantallaPpal = new PantallaPpal(); //creo una pantallaPpal
 				pantallaPpal.setVisible(true); // lo hago visible
-				pantallaPpal.setLocationRelativeTo(null); // abrirlo en el centro	
+				pantallaPpal.setLocationRelativeTo(null); // abrirlo en el centro
+				dispose(); //cierra ventana de login
                 
             }else {
                 System.out.println("Acceso de alumnos");

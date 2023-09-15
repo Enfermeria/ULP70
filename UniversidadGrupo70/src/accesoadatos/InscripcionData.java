@@ -52,6 +52,27 @@ public class InscripcionData {
 	}
 	
 	
+	public boolean altaInscripcion(double nota, int idAlumno, int idMateria){// agrega la inscripcion a la BD. inscripcion viene sin idinscripcion. Devuelve true si pudo
+		//Estoy presuponiendo que al alumno y materia que trae la inscripcion YA ESTAN EN LA BD.
+		// una alternativa es usar ?,?,? y luego insertarlo con preparedStatement.setInt(1, dato) // o setString, setBoolean, setData
+		String sql = "Insert into inscripcion (idinscripcion, nota, idalumno, idmateria) " +
+			"VALUES " + "(null," + 
+				((nota==0.0)?"null":nota) +  ", " + 
+				idAlumno + ", " +
+				idMateria + ")";
+		System.out.println("SQL:" + sql);
+		if (conexion.sqlUpdate(sql)) {
+			mensaje("Alta de inscripcion exitosa");
+			conexion.cerrarSentencia(); //cierra PreparedStatement y como consecuencia tambien el reultSet
+			return true;
+		} else {
+			mensajeError("Falló el alta de inscripcion");
+			return false;
+		}
+	}
+	
+	
+	
 	
 	
 	//da de baja al inscripcion de la BD. inscripcion viene con idinscripcion
@@ -63,6 +84,20 @@ public class InscripcionData {
 	
 	public boolean bajaInscripcion(int idInscripcion){// da de baja al inscripcion de la BD en base al id. Devuelve true si pudo
 		String sql = "Delete from inscripcion where idinscripcion=" + idInscripcion;
+		if (conexion.sqlUpdate(sql)){
+			mensaje("Baja de inscripcion exitosa");
+			conexion.cerrarSentencia();
+			return true;
+		} 
+		else {
+			mensajeError("Falló la baja de la inscripcion");
+			return false;
+		}
+	}
+	
+	
+	public boolean bajaInscripcion(int idAlumno, int idMateria){// da de baja al inscripcion de la BD en base al idAlumno y id Materia Devuelve true si pudo
+		String sql = "Delete from inscripcion where idAlumno=" + idAlumno + " and idMateria=" + idMateria;
 		if (conexion.sqlUpdate(sql)){
 			mensaje("Baja de inscripcion exitosa");
 			conexion.cerrarSentencia();
@@ -210,6 +245,34 @@ public class InscripcionData {
 		return listaMaterias;
 	}
 	
+	
+	/**
+	 * // dado un idAlumno, devuelve la lista de materias disponibles para 
+	 * inscribirse (que no cursa)
+	 * @param idalumno el alumnos usado en la consulta
+	 * @return lista de materias disponibles para inscribirse
+	 */
+	public List<Materia> getListaMateriasDisponiblesXAlumno(int idalumno) { 
+		MateriaData materiaData = new MateriaData();
+		ArrayList<Materia> listaMaterias = new ArrayList();
+		String sql = 
+			"select distinct m.idmateria, m.nombre, m.anio, m.estado from materia m, inscripcion i " +
+			"where m.idmateria = i.idmateria and i.idmateria not in " +
+			"(select m.idmateria from materia m, inscripcion i " +
+			"where i.idmateria = m.idmateria and i.idalumno=" + idalumno + ")";
+		ResultSet rs = conexion.sqlSelect(sql);
+		try {
+			while (rs.next()) {
+				Materia materia = materiaData.resultSet2Materia(rs);
+				listaMaterias.add(materia);
+			}
+			conexion.cerrarSentencia(); // cierra el PreparedStatement y tambien cierra automaticamente el ResultSet
+		} catch (SQLException ex) {
+			mensajeError("Error al obtener lista de materias disponibles x alumno" + ex.getMessage());
+		}
+
+		return listaMaterias;
+	} // getListaMateriasDisponiblesXAlumno
 	
 	
 	public Inscripcion getInscripcion(int id){
