@@ -163,6 +163,7 @@ public class GestionInscripciones extends javax.swing.JInternalFrame {
 	}// borrarTablaMaterias
 
 		
+	
 		
 	
 	/**
@@ -219,68 +220,15 @@ public class GestionInscripciones extends javax.swing.JInternalFrame {
 			filtro.estoyFiltrando = true;
 			cargarListaAlumnos();
 			cargarTablaAlumnos();
+			setearFiltro();
 			return true; // pudo buscar
 		}
 	} //buscarAlumno
 	
-	
-	
-	
-	
-	/** habilito boton buscar cuando alguno de los campos tenga datos*/
-	private void habilitoParaBuscar(){ 
-		if (txtId.getText()!=null || txtDni.getText()!= null || txtApellido.getText() != null || txtNombre.getText() != null)
-			btnBuscar.setEnabled(true);
-	} //habilitoParaBuscar
 
 	
 		
-	
-	/** deshabilito todos los botones y tabla, habilito guardar/cancelar */
-	private void habilitoParaEditar(){ 
-		// deshabilito todos los botones (menos salir)
-		
-		btnBuscar.setEnabled(false);
-		cboxOrden.setEnabled(false);
-		
-		//Deshabilito la Tabla para que no pueda hacer click
-		tablaAlumnos.setEnabled(false);
-		
-		//Habilito los botones guardar y cancelar
-		
-		btnCancelar.setEnabled(true);
-		
-		//Habilito los campos para poder editar
-		txtDni.setEditable(true);
-		txtApellido.setEditable(true);
-		txtNombre.setEditable(true);
-		
-	} //habilitoParaEditar
 
-	
-	
-	
-	/** habilito todos los botones y tabla, deshabilito guardar/cancelar y modificar */
-	private void deshabilitoParaEditar(){ 
-		limpiarCampos(); //Pongo todos los campos de texto en blanco
-		// habilito todos los botones (menos salir)
-		
-		btnBuscar.setEnabled(true);
-		cboxOrden.setEnabled(true);
-		
-		//Habilito la Tabla para que pueda hacer click
-		tablaAlumnos.setEnabled(true);
-	
-		//deshabilito los campos para poder que no pueda editar
-		txtId.setEditable(false);
-		txtDni.setEditable(false);
-		txtApellido.setEditable(false);
-		txtNombre.setEditable(false);
-		
-	} //deshabilitoParaEditar
-
-	
-	
 	
 	
 	/** pongo los campos txtfield en blanco y deselecciono la fila de tabla */
@@ -337,55 +285,7 @@ public class GestionInscripciones extends javax.swing.JInternalFrame {
 	
 	
 	
-	/**
-	 * Cargo los campos de texto de la pantalla a un objeto tipo Alumno
-	 * @return El Alumno devuelto. Si hay algún error, devuelve null
-	 */
-//	private Alumno campos2Alumno(){ 
-//		int idAlumno, dni;
-//		String apellido, nombre;
-//		LocalDate fechaNacimiento;
-//		boolean estado;
-//		
-//		//idAlumno
-//		try {
-//			if (txtId.getText().isEmpty()) // en el alta será un string vacío
-//				idAlumno = -1;
-//			else
-//				idAlumno = Integer.valueOf(txtId.getText()); // obtengo el identificador el alumno
-//		} catch (NumberFormatException e) {
-//			JOptionPane.showMessageDialog(this, "El Id debe ser un número válido", "Id no válido", JOptionPane.ERROR_MESSAGE);
-//			return null;
-//		}
-//		
-//		//dni
-//		try {
-//			dni = Integer.valueOf(txtDni.getText());
-//				
-//		} catch (NumberFormatException e) {
-//			JOptionPane.showMessageDialog(this, "El DNI debe ser un número válido", "DNI no válido", JOptionPane.ERROR_MESSAGE);
-//			return null;
-//		}
-//		
-//		//apellido y nombre
-//		apellido = txtApellido.getText();
-//		nombre = txtNombre.getText();
-//		
-////		//fechaNacimiento
-////		if (jdcFechaNacimiento.getDate() != null)
-////			fechaNacimiento = Utils.date2LocalDate(jdcFechaNacimiento.getDate());
-////		else {
-////			JOptionPane.showMessageDialog(this, "La fecha de nacimiento debe ser una fecha válida", "Nacimiento no válido", JOptionPane.ERROR_MESSAGE);
-////			return null;
-////		}
-////		
-////		//estado
-////		estado = checkboxEstado.isSelected(); 
-////		
-//		return new Alumno(idAlumno, dni, apellido, nombre, estado);
-//	} // campos2Alumno
-//	
-	
+
 
 	/** 
 	 * cambia titulo y color de panel de tabla de alumnos para reflejar que 
@@ -438,8 +338,6 @@ public class GestionInscripciones extends javax.swing.JInternalFrame {
         btnSalir = new javax.swing.JButton();
         cboxOrden = new javax.swing.JComboBox<>();
         jLabel2 = new javax.swing.JLabel();
-        btnBuscar2 = new javax.swing.JButton();
-        btnCancelar = new javax.swing.JButton();
         panelTablaAlumnos = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
         tablaAlumnos = new javax.swing.JTable();
@@ -464,11 +362,11 @@ public class GestionInscripciones extends javax.swing.JInternalFrame {
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         botonera.setBackground(new java.awt.Color(153, 153, 255));
+        botonera.setPreferredSize(new java.awt.Dimension(625, 70));
 
         btnBuscar.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         btnBuscar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/lupa32x32.png"))); // NOI18N
         btnBuscar.setText("Buscar");
-        btnBuscar.setEnabled(false);
         btnBuscar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnBuscarActionPerformed(evt);
@@ -494,65 +392,39 @@ public class GestionInscripciones extends javax.swing.JInternalFrame {
         jLabel2.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
         jLabel2.setText("Ordenado");
 
-        btnBuscar2.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
-        btnBuscar2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/guardar2_32x32.png"))); // NOI18N
-        btnBuscar2.setText("Buscar");
-        btnBuscar2.setEnabled(false);
-        btnBuscar2.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnBuscar2ActionPerformed(evt);
-            }
-        });
-
-        btnCancelar.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
-        btnCancelar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/cancelar32x32.png"))); // NOI18N
-        btnCancelar.setText("Cancelar");
-        btnCancelar.setEnabled(false);
-        btnCancelar.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnCancelarActionPerformed(evt);
-            }
-        });
-
         javax.swing.GroupLayout botoneraLayout = new javax.swing.GroupLayout(botonera);
         botonera.setLayout(botoneraLayout);
         botoneraLayout.setHorizontalGroup(
             botoneraLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(botoneraLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(btnBuscar2)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(btnCancelar)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(btnBuscar)
-                .addGap(18, 18, 18)
+                .addGap(62, 62, 62)
                 .addGroup(botoneraLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel2)
                     .addComponent(cboxOrden, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 212, Short.MAX_VALUE)
                 .addComponent(btnSalir)
                 .addContainerGap())
         );
         botoneraLayout.setVerticalGroup(
             botoneraLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(botoneraLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(btnSalir)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, botoneraLayout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(botoneraLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(btnBuscar)
                     .addGroup(botoneraLayout.createSequentialGroup()
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 5, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGroup(botoneraLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(botoneraLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                .addComponent(btnBuscar2)
-                                .addComponent(btnCancelar))
-                            .addGroup(botoneraLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                .addComponent(btnBuscar)
-                                .addComponent(cboxOrden, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                    .addComponent(jLabel2)
-                    .addComponent(btnSalir))
-                .addGap(11, 11, 11))
+                        .addComponent(jLabel2)
+                        .addGap(3, 3, 3)
+                        .addComponent(cboxOrden, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addGap(16, 16, 16))
         );
 
-        getContentPane().add(botonera, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 404, -1, -1));
+        getContentPane().add(botonera, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 404, 625, 68));
 
         panelTablaAlumnos.setBackground(new java.awt.Color(153, 153, 255));
 
@@ -623,7 +495,7 @@ public class GestionInscripciones extends javax.swing.JInternalFrame {
                     .addComponent(btnResetearFiltro)
                     .addComponent(lblTituloTablaAlumnos))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 282, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 286, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -827,9 +699,7 @@ public class GestionInscripciones extends javax.swing.JInternalFrame {
 	
 	
     private void btnBuscarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBuscarActionPerformed
-        limpiarCampos();
-//        botonGuardarComoBuscar(); //cambio icono y texto del btnGuardar a "Buscar"
-        habilitoParaBuscar();
+        buscarAlumno();
     }//GEN-LAST:event_btnBuscarActionPerformed
 
 	
@@ -898,6 +768,9 @@ public class GestionInscripciones extends javax.swing.JInternalFrame {
         } 
     }//GEN-LAST:event_tablaMateriasInscriptasMouseClicked
 
+	
+	
+	
     private void btnDesinscribirseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDesinscribirseActionPerformed
 		if (tablaMateriasInscriptas.getSelectedRow() != -1){ // si hay alguna fila seleccionada
 			btnDesinscribirse.setEnabled(false); // deshabilito botón Desinscribirse.
@@ -963,39 +836,12 @@ public class GestionInscripciones extends javax.swing.JInternalFrame {
 	
 	
 	
-    private void btnBuscar2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBuscar2ActionPerformed
-
-//        if ( tipoEdicion == TipoEdicion.AGREGAR ){ //agregar el alumno
-//            agregarAlumno();
-//            resetearFiltro();
-//        } else if ( tipoEdicion == TipoEdicion.MODIFICAR ) { // modificar el alumno
-//            modificarAlumno();
-//            resetearFiltro();
-//        } else { // tipoEdicion = BUSCAR: quiere buscar un alumno
-//            buscarAlumno();
-//            setearFiltro();
-//        }
-
-//        limpiarCampos();
-//        botonGuardarComoGuardar();//por si estaba buscando cambio icono y texto del btnGuardar a "Guardar"
-//        deshabilitoParaEditar();
-    }//GEN-LAST:event_btnBuscar2ActionPerformed
-
-    private void btnCancelarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelarActionPerformed
-        limpiarCampos();
-//        botonGuardarComoGuardar(); //por si estaba buscando cambio icono y texto del btnGuardar a "Guardar"
-//        deshabilitoParaEditar();
-
-    }//GEN-LAST:event_btnCancelarActionPerformed
-
     
    
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel botonera;
     private javax.swing.JButton btnBuscar;
-    private javax.swing.JButton btnBuscar2;
-    private javax.swing.JButton btnCancelar;
     private javax.swing.JButton btnDesinscribirse;
     private javax.swing.JButton btnInscribirse;
     private javax.swing.JButton btnResetearFiltro;
