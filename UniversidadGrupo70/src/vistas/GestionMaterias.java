@@ -488,7 +488,7 @@ public class GestionMaterias extends javax.swing.JInternalFrame {
                 .addGroup(botoneraLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel2)
                     .addComponent(cboxOrden, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 129, Short.MAX_VALUE)
                 .addComponent(btnSalir)
                 .addContainerGap())
         );
@@ -510,7 +510,7 @@ public class GestionMaterias extends javax.swing.JInternalFrame {
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        getContentPane().add(botonera, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 335, -1, -1));
+        getContentPane().add(botonera, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 335, 860, -1));
 
         panelTabla.setBackground(new java.awt.Color(153, 153, 255));
 
@@ -575,7 +575,7 @@ public class GestionMaterias extends javax.swing.JInternalFrame {
                     .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
                     .addGroup(panelTablaLayout.createSequentialGroup()
                         .addGap(8, 8, 8)
-                        .addComponent(lblTituloTabla, javax.swing.GroupLayout.DEFAULT_SIZE, 277, Short.MAX_VALUE)
+                        .addComponent(lblTituloTabla, javax.swing.GroupLayout.DEFAULT_SIZE, 397, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(btnResetearFiltro)))
                 .addContainerGap())
@@ -591,7 +591,7 @@ public class GestionMaterias extends javax.swing.JInternalFrame {
                 .addContainerGap())
         );
 
-        getContentPane().add(panelTabla, new org.netbeans.lib.awtextra.AbsoluteConstraints(297, 0, 450, -1));
+        getContentPane().add(panelTabla, new org.netbeans.lib.awtextra.AbsoluteConstraints(297, 0, 570, -1));
 
         panelDatos.setBackground(new java.awt.Color(153, 153, 255));
 
