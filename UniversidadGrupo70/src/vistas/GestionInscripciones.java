@@ -22,7 +22,7 @@ import javax.swing.table.DefaultTableModel;
 public class GestionInscripciones extends javax.swing.JInternalFrame {
 	DefaultTableModel modeloTablaAlumnos, modeloTablaMateriasInscriptas, modeloTablaMateriasDisponibles;
 	public static List<Alumno> listaAlumnos;
-    public static List<Materia> listaMateriasInscriptas; //lista de materias en la que está inscripto un alumno
+    public static List<Inscripcion> listaInscripciones; //lista de inscripciones de un alumno
     public static List<Materia> listaMateriasDisponibles;//lista de materias en las que NO está inscripto un alumno
 	private final AlumnoData alumnoData;	
     private final MateriaData materiaData;
@@ -102,12 +102,13 @@ public class GestionInscripciones extends javax.swing.JInternalFrame {
 			modeloTablaMateriasDisponibles.removeRow(fila);
 		
 		//cargo las materias  de listaMateriasInscriptas a la tablaMateriasInscriptas
-		for (Materia materia : listaMateriasInscriptas) {
+		for (Inscripcion inscripcion : listaInscripciones) {
 			modeloTablaMateriasInscriptas.addRow(new Object[] {
-				materia.getIdmateria(),
-				materia.getAnio(),
-				materia.getNombre(),
-				materia.getEstado() } 
+				inscripcion.getIdinscripcion(),
+				inscripcion.getMateria().getIdmateria(),
+				inscripcion.getMateria().getAnio(),
+				inscripcion.getMateria().getNombre(),
+				inscripcion.getNota() } 
 			);
 		}
 	
@@ -143,7 +144,7 @@ public class GestionInscripciones extends javax.swing.JInternalFrame {
 	 * @param idAlumno 
 	 */
 	private void cargarListaMaterias(int idAlumno){
-		listaMateriasInscriptas = inscripcionData.getListaMateriasXAlumno(idAlumno);
+		listaInscripciones = inscripcionData.getListaInscripcionesDelAlumno(idAlumno);
 		listaMateriasDisponibles = inscripcionData.getListaMateriasDisponiblesXAlumno(idAlumno);
 	}// cargarListaMaterias
 
@@ -280,12 +281,19 @@ public class GestionInscripciones extends javax.swing.JInternalFrame {
 	 * @param numfila el número de fila a cargar a los campos
 	 */
 	private int filaTablaInscriptas2IdMateria(int numfila){
+		return (Integer)tablaMateriasInscriptas.getValueAt(numfila, 1);			
+	} //filaTablaInscriptas2IdMateria
+	
+	private int filaTablaInscriptas2IdInscripcion(int numfila){
 		return (Integer)tablaMateriasInscriptas.getValueAt(numfila, 0);			
 	} //filaTablaInscriptas2IdMateria
 	
 	
+	private double filaTablaInscriptas2Nota(int numfila){
+		return (Double)tablaMateriasInscriptas.getValueAt(numfila, 4);			
+	} //filaTablaInscriptas2IdMateria
 	
-
+	
 
 	/** 
 	 * cambia titulo y color de panel de tabla de alumnos para reflejar que 
@@ -508,14 +516,14 @@ public class GestionInscripciones extends javax.swing.JInternalFrame {
 
             },
             new String [] {
-                "Id", "Año", "Nombre", "Activo"
+                "Id inscripción", "Id materia", "Año", "Nombre", "Nota"
             }
         ) {
             Class[] types = new Class [] {
-                java.lang.Integer.class, java.lang.Integer.class, java.lang.String.class, java.lang.Boolean.class
+                java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.String.class, java.lang.Double.class
             };
             boolean[] canEdit = new boolean [] {
-                false, false, false, false
+                false, false, false, false, true
             };
 
             public Class getColumnClass(int columnIndex) {
@@ -532,6 +540,11 @@ public class GestionInscripciones extends javax.swing.JInternalFrame {
                 tablaMateriasInscriptasMouseClicked(evt);
             }
         });
+        tablaMateriasInscriptas.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
+            public void propertyChange(java.beans.PropertyChangeEvent evt) {
+                tablaMateriasInscriptasPropertyChange(evt);
+            }
+        });
         jScrollPane2.setViewportView(tablaMateriasInscriptas);
 
         lblTituloTabla1.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
@@ -543,13 +556,12 @@ public class GestionInscripciones extends javax.swing.JInternalFrame {
         panelTablaMateriasInscriptasLayout.setHorizontalGroup(
             panelTablaMateriasInscriptasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(panelTablaMateriasInscriptasLayout.createSequentialGroup()
+                .addGap(18, 18, 18)
+                .addComponent(lblTituloTabla1, javax.swing.GroupLayout.DEFAULT_SIZE, 297, Short.MAX_VALUE)
+                .addGap(155, 155, 155))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelTablaMateriasInscriptasLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(panelTablaMateriasInscriptasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
-                    .addGroup(panelTablaMateriasInscriptasLayout.createSequentialGroup()
-                        .addGap(8, 8, 8)
-                        .addComponent(lblTituloTabla1, javax.swing.GroupLayout.DEFAULT_SIZE, 212, Short.MAX_VALUE)
-                        .addGap(145, 145, 145)))
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
                 .addContainerGap())
         );
         panelTablaMateriasInscriptasLayout.setVerticalGroup(
@@ -562,7 +574,7 @@ public class GestionInscripciones extends javax.swing.JInternalFrame {
                 .addContainerGap())
         );
 
-        getContentPane().add(panelTablaMateriasInscriptas, new org.netbeans.lib.awtextra.AbsoluteConstraints(635, 0, -1, -1));
+        getContentPane().add(panelTablaMateriasInscriptas, new org.netbeans.lib.awtextra.AbsoluteConstraints(635, 0, 470, -1));
 
         panelTablaMateriasDisponibles.setBackground(new java.awt.Color(153, 153, 255));
 
@@ -777,17 +789,17 @@ public class GestionInscripciones extends javax.swing.JInternalFrame {
         }
         int numfilaInsc = tablaMateriasInscriptas.getSelectedRow();
         if (numfilaInsc != -1) { //si hay alguna fila seleccionada en la tabla de materias disponibles
-			int idMateria = filaTablaInscriptas2IdMateria(numfilaInsc);//averiguamos el idMateria
+			int idInscripcion = filaTablaInscriptas2IdInscripcion(numfilaInsc);//averiguamos el idMateria
 			
 		    int numfilaAlumno = tablaAlumnos.getSelectedRow();
 			if (numfilaAlumno != -1) {
 				int idAlumno = filaTablaAlumnos2IdAlumno(numfilaAlumno);
-				inscripcionData.bajaInscripcion(idAlumno, idMateria); // Lo inscribimos
+				inscripcionData.bajaInscripcion(idInscripcion); // Lo inscribimos
 				
 				//actualizamos las listas y tablas de materias
 				cargarListaMaterias(idAlumno);
 				cargarTablaMaterias();
-         	}
+			}
 		}
     }//GEN-LAST:event_btnDesinscribirseActionPerformed
 
@@ -830,6 +842,26 @@ public class GestionInscripciones extends javax.swing.JInternalFrame {
          	}
 		}
     }//GEN-LAST:event_btnInscribirseActionPerformed
+
+    private void tablaMateriasInscriptasPropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_tablaMateriasInscriptasPropertyChange
+        //supuestamente cambio la nota
+		//System.out.println("CAMBIO LA NOTA!!!!!!!!!!");
+		if (tablaMateriasInscriptas.getEditingRow() == -1) { //si no hay nada editado devuelve -1
+			// System.out.println("ERROR... NO HAY FILA Editandose");
+			return;
+        }
+        int numfilaInsc = tablaMateriasInscriptas.getEditingRow();
+        if (numfilaInsc != -1) { //si hay alguna fila editandose en la tabla de materias disponibles
+			int idInscripcion = filaTablaInscriptas2IdInscripcion(numfilaInsc);//averiguamos el idinscripcion
+			Inscripcion inscripcion = inscripcionData.getInscripcion(idInscripcion); // obtengo la inscripcion
+			inscripcion.setNota(filaTablaInscriptas2Nota(numfilaInsc)); 
+			inscripcionData.modificarInscripcion(inscripcion);
+		    
+			//actualizamos las listas y tablas de materias
+			cargarListaMaterias(inscripcion.getAlumno().getIdalumno());
+			cargarTablaMaterias();
+		}
+    }//GEN-LAST:event_tablaMateriasInscriptasPropertyChange
 
 	
 	
