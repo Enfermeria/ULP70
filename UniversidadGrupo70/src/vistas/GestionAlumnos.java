@@ -23,7 +23,7 @@ public class GestionAlumnos extends javax.swing.JInternalFrame {
 	private TipoEdicion tipoEdicion = TipoEdicion.AGREGAR; //para que el boton guardar sepa que estoy queriendo hacer:
 														   // Si con los campos voy a agregar, modificar o buscar un alumno
 	private Ordenacion ordenacion = Ordenacion.PORIDALUMNO; // defino el tipo de orden por defecto 
-	private Filtro filtro = new Filtro();  //el filtro de búsqueda
+	private FiltroAlumnos filtro = new FiltroAlumnos();  //el filtro de búsqueda
 	
 	//DefaultTableModel modeloTabla = new DefaultTableModel() {
 	//	public boolean isCellEditable(int fila, int columna) {
@@ -938,14 +938,14 @@ public class GestionAlumnos extends javax.swing.JInternalFrame {
  * Es una clase para agrupar y almacenar los datos con los que se filtra una búsqueda
  * @author John David Molina Velarde
  */
-class Filtro{
+class FiltroAlumnos{
 	int id;
 	int dni;
 	String apellido;
 	String nombre;
 	boolean estoyFiltrando;
 
-	public Filtro() { // constructor
+	public FiltroAlumnos() { // constructor
 		id = -1;
 		dni = -1;
 		apellido = "";

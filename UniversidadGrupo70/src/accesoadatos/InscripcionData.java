@@ -255,11 +255,15 @@ public class InscripcionData {
 	public List<Materia> getListaMateriasDisponiblesXAlumno(int idalumno) { 
 		MateriaData materiaData = new MateriaData();
 		ArrayList<Materia> listaMaterias = new ArrayList();
+		//String sql = 
+		//	"select distinct m.idmateria, m.nombre, m.anio, m.estado from materia m, inscripcion i " +
+		//	"where m.idmateria = i.idmateria and i.idmateria not in " +
+		//	"(select m.idmateria from materia m, inscripcion i " +
+		//	"where i.idmateria = m.idmateria and i.idalumno=" + idalumno + ")";
 		String sql = 
-			"select distinct m.idmateria, m.nombre, m.anio, m.estado from materia m, inscripcion i " +
-			"where m.idmateria = i.idmateria and i.idmateria not in " +
-			"(select m.idmateria from materia m, inscripcion i " +
-			"where i.idmateria = m.idmateria and i.idalumno=" + idalumno + ")";
+			"select m.idmateria, m.nombre, m.anio, m.estado from materia m " +
+			"where m.idmateria not in " +
+			"(select i.idmateria from inscripcion i where i.idalumno=" + idalumno + ")";
 		ResultSet rs = conexion.sqlSelect(sql);
 		try {
 			while (rs.next()) {
@@ -273,6 +277,38 @@ public class InscripcionData {
 
 		return listaMaterias;
 	} // getListaMateriasDisponiblesXAlumno
+	
+	
+	
+	/**
+	 * // dado un idMateria, devuelve la lista de alumnos disponibles para 
+	 * inscribirse 
+	 * @param idmateria la idmateria usada en la consulta
+	 * @return lista de alummnos disponibles para inscribirse
+	 */
+	public List<Alumno> getListaAlumnosDisponiblesXMateria(int idmateria) { 
+		AlumnoData alumnoData = new AlumnoData();
+		ArrayList<Alumno> listaAlumnos = new ArrayList();
+		String sql = 
+			"select a.idalumno, a.dni, a.apellido, a.nombre, a.fechaNacimiento, a.estado from alumno a " +
+			"where a.idalumno not in " +
+			"(select i.idalumno from inscripcion i where i.idmateria=" + idmateria + ")";
+		ResultSet rs = conexion.sqlSelect(sql);
+		try {
+			while (rs.next()) {
+				Alumno alumno = alumnoData.resultSet2Alumno(rs);
+				listaAlumnos.add(alumno);
+			}
+			conexion.cerrarSentencia(); // cierra el PreparedStatement y tambien cierra automaticamente el ResultSet
+		} catch (SQLException ex) {
+			mensajeError("Error al obtener lista de alumnos disponibles x materia" + ex.getMessage());
+		}
+
+		return listaAlumnos;
+	} // getListaAlumnosDisponiblesXMateria
+	
+	
+	
 	
 	
 	public Inscripcion getInscripcion(int id){

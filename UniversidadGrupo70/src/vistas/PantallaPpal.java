@@ -37,7 +37,8 @@ public class PantallaPpal extends javax.swing.JFrame {
         jMenu2 = new javax.swing.JMenu();
         menuGestionMaterias = new javax.swing.JMenuItem();
         jMenu3 = new javax.swing.JMenu();
-        menuGestionInscripciones = new javax.swing.JMenuItem();
+        menuGestionInscripcionesporAlumno = new javax.swing.JMenuItem();
+        menuGestionInscripcionesporMateria = new javax.swing.JMenuItem();
         menuSalir = new javax.swing.JMenu();
         menuSalirSistema = new javax.swing.JMenuItem();
 
@@ -84,13 +85,21 @@ public class PantallaPpal extends javax.swing.JFrame {
 
         jMenu3.setText("Inscripciones");
 
-        menuGestionInscripciones.setText("Gestión de inscripciones");
-        menuGestionInscripciones.addActionListener(new java.awt.event.ActionListener() {
+        menuGestionInscripcionesporAlumno.setText("Gestión de inscripciones Alumnos por materia");
+        menuGestionInscripcionesporAlumno.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                menuGestionInscripcionesActionPerformed(evt);
+                menuGestionInscripcionesporAlumnoActionPerformed(evt);
             }
         });
-        jMenu3.add(menuGestionInscripciones);
+        jMenu3.add(menuGestionInscripcionesporAlumno);
+
+        menuGestionInscripcionesporMateria.setText("Gestión de inscripciones Materias por alumno");
+        menuGestionInscripcionesporMateria.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                menuGestionInscripcionesporMateriaActionPerformed(evt);
+            }
+        });
+        jMenu3.add(menuGestionInscripcionesporMateria);
 
         jMenuBar1.add(jMenu3);
 
@@ -153,8 +162,8 @@ public class PantallaPpal extends javax.swing.JFrame {
 		escritorio.moveToFront(gm); //pongo la ventana al frente:
     }//GEN-LAST:event_menuGestionMateriasActionPerformed
 
-    private void menuGestionInscripcionesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuGestionInscripcionesActionPerformed
-                escritorio.removeAll(); // cierro todas las ventanas del escritorio
+    private void menuGestionInscripcionesporAlumnoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuGestionInscripcionesporAlumnoActionPerformed
+        escritorio.removeAll(); // cierro todas las ventanas del escritorio
 		escritorio.repaint();
 		
 		GestionInscripciones gi = new GestionInscripciones(); // creo un internal Frame
@@ -162,7 +171,18 @@ public class PantallaPpal extends javax.swing.JFrame {
 		
 		escritorio.add(gi); // lo pongo en el escritorio
 		escritorio.moveToFront(gi); //pongo la ventana al frente:
-    }//GEN-LAST:event_menuGestionInscripcionesActionPerformed
+    }//GEN-LAST:event_menuGestionInscripcionesporAlumnoActionPerformed
+
+    private void menuGestionInscripcionesporMateriaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuGestionInscripcionesporMateriaActionPerformed
+        escritorio.removeAll(); // cierro todas las ventanas del escritorio
+		escritorio.repaint();
+		
+		GestionInscripcionesMateria gi = new GestionInscripcionesMateria(); // creo un internal Frame
+		gi.setVisible(true); // lo pongo visible
+		
+		escritorio.add(gi); // lo pongo en el escritorio
+		escritorio.moveToFront(gi); //pongo la ventana al frente:
+    }//GEN-LAST:event_menuGestionInscripcionesporMateriaActionPerformed
 
 	
 	@Override
@@ -214,7 +234,8 @@ public class PantallaPpal extends javax.swing.JFrame {
     private javax.swing.JMenu jMenu3;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JMenuItem menuGestionAlumnos;
-    private javax.swing.JMenuItem menuGestionInscripciones;
+    private javax.swing.JMenuItem menuGestionInscripcionesporAlumno;
+    private javax.swing.JMenuItem menuGestionInscripcionesporMateria;
     private javax.swing.JMenuItem menuGestionMaterias;
     private javax.swing.JMenu menuSalir;
     private javax.swing.JMenuItem menuSalirSistema;

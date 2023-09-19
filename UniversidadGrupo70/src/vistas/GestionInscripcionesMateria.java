@@ -19,70 +19,68 @@ import javax.swing.table.DefaultTableModel;
  *
  * @author John David Molina Velarde, Leticia Mores, Enrique Germán Martínez, Carlos Eduardo Beltrán
  */
-public class GestionInscripciones extends javax.swing.JInternalFrame {
-	DefaultTableModel modeloTablaAlumnos, modeloTablaMateriasInscriptas, modeloTablaMateriasDisponibles;
-	public static List<Alumno> listaAlumnos;
+public class GestionInscripcionesMateria extends javax.swing.JInternalFrame {
+	DefaultTableModel modeloTablaMaterias, modeloTablaAlumnosInscriptos, modeloTablaAlumnosDisponibles;
+	public static List<Materia> listaMaterias;
     public static List<Inscripcion> listaInscripciones; //lista de inscripciones de un alumno
-    public static List<Materia> listaMateriasDisponibles;//lista de materias en las que NO está inscripto un alumno
+    public static List<Alumno> listaAlumnosDisponibles;//lista de materias en las que NO está inscripto un alumno
 	private final AlumnoData alumnoData;	
     private final MateriaData materiaData;
     private final InscripcionData inscripcionData;
 	// private enum TipoEdicion {AGREGAR, MODIFICAR, BUSCAR};
-	private Ordenacion ordenacion = Ordenacion.PORIDALUMNO; // defino el tipo de orden por defecto 
-	private FiltroAlumnos filtro = new FiltroAlumnos();  //el filtro de búsqueda
+	private MateriaData.Ordenacion ordenacion = MateriaData.Ordenacion.PORIDMATERIA; // defino el tipo de orden por defecto 
+	private FiltroMaterias filtro = new FiltroMaterias();  //el filtro de búsqueda
 	
 
 	/**
 	 * Creates new form GestionInscripciones
 	 */
-	public GestionInscripciones() {
+	public GestionInscripcionesMateria() {
 		initComponents();
 		alumnoData = new AlumnoData();
 		materiaData = new MateriaData();
         inscripcionData = new InscripcionData();
-        modeloTablaAlumnos = (DefaultTableModel) tablaAlumnos.getModel();
-        modeloTablaMateriasInscriptas = (DefaultTableModel) tablaMateriasInscriptas.getModel();
-        modeloTablaMateriasDisponibles = (DefaultTableModel) tablaMateriasDisponibles.getModel();
+        modeloTablaMaterias = (DefaultTableModel) tablaMaterias.getModel();
+        modeloTablaAlumnosInscriptos = (DefaultTableModel) tablaAlumnosInscriptos.getModel();
+        modeloTablaAlumnosDisponibles = (DefaultTableModel) tablaAlumnosDisponibles.getModel();
                 
-		cargarListaAlumnos(); //carga la base de datos
-		cargarTablaAlumnos(); // cargo la tabla con los alumnos
+		cargarListaMaterias(); //carga la base de datos
+		cargarTablaMaterias(); // cargo la tabla con los alumnos
 	} // constructor
 
 	/** carga la lista de alumnos de la BD */
-	private void cargarListaAlumnos(){ 
+	private void cargarListaMaterias(){ 
 		if (filtro.estoyFiltrando) 
-			listaAlumnos = alumnoData.getListaAlumnosXCriterioDeBusqueda(filtro.id, filtro.dni, filtro.apellido, filtro.nombre, ordenacion);
+			listaMaterias = materiaData.getListaMateriasXCriterioDeBusqueda(filtro.id, filtro.anio, filtro.nombre, ordenacion);
 		else
-			listaAlumnos = alumnoData.getListaAlumnos(ordenacion);
+			listaMaterias = materiaData.getListaMaterias(ordenacion);
 	}//cargarListaAlumnos
 	
 	
-	/** carga alumnos de la lista a la tabla */
-	private void cargarTablaAlumnos(){ 
+	/** carga materias de la lista a la tabla */
+	private void cargarTablaMaterias(){ 
 		//borro las filas de la tabla
-		for (int fila = modeloTablaAlumnos.getRowCount() -  1; fila >= 0; fila--)
-			modeloTablaAlumnos.removeRow(fila);
+		for (int fila = modeloTablaMaterias.getRowCount() -  1; fila >= 0; fila--)
+			modeloTablaMaterias.removeRow(fila);
 		
-		//cargo los alumnos de listaAlumnos a la tabla
-		for (Alumno alumno : listaAlumnos) {
-			modeloTablaAlumnos.addRow(new Object[] {
-				alumno.getIdalumno(),
-				alumno.getDni(),
-				alumno.getApellido(),
-				alumno.getNombre(),
-				alumno.getFechaNacimiento(),
-				alumno.getEstado() } 
+		//cargo los alumnos de listaMaterias a la tabla
+		for (Materia materia : listaMaterias) {
+			modeloTablaMaterias.addRow(new Object[] {
+				materia.getIdmateria(),
+				materia.getAnio(),
+				materia.getNombre(),
+				materia.getEstado() } 
 			);
 		}
 		
 		//como no hay fila seleccionada, deshabilito el botón Eliminar y Modificar
-		if (tablaAlumnos.getSelectedRow() == -1) {// si no hay alguna fila seleccionada
+		if (tablaMaterias.getSelectedRow() == -1) {// si no hay alguna fila seleccionada
 			btnInscribirse.setEnabled(false); // deshabilito el botón de Inscribir
 			btnDesinscribirse.setEnabled(false); // deshabilito el botón de Desinscribir
-			borrarTablaMaterias();   
+			borrarTablaAlumnosInscriptosYDisponibles();   
 		}else {//hay una fila seleccionada, cargamos y mostramos las tablas de materias inscriptas y disponibles.
-			cargarListaMaterias(filaTablaAlumnos2IdAlumno(tablaAlumnos.getSelectedRow()));
-			cargarTablaMaterias();
+			cargarListaAlumnos(filaTablaMaterias2IdMateria(tablaMaterias.getSelectedRow()));
+			cargarTablaAlumnosInscriptosYDisponibles();
         }
 	} //cargarTablaAlumnos
 	
@@ -90,50 +88,52 @@ public class GestionInscripciones extends javax.swing.JInternalFrame {
 	
 	
 	/**Carga listaMateriasInscriptas a la tablaMateriasInscriptas y 
-	 * listaMateriasDisponibles a la tablaMateriasDisponibles
+ listaAlumnosDisponibles a la tablaMateriasDisponibles
 	 */
-	private void cargarTablaMaterias(){
-		//borro las filas de la tablaMateriasInscriptas
-		for (int fila = modeloTablaMateriasInscriptas.getRowCount() -  1; fila >= 0; fila--)
-			modeloTablaMateriasInscriptas.removeRow(fila);
+	private void cargarTablaAlumnosInscriptosYDisponibles(){
+		//borro las filas de la tablaAlumnosInscriptas
+		for (int fila = modeloTablaAlumnosInscriptos.getRowCount() -  1; fila >= 0; fila--)
+			modeloTablaAlumnosInscriptos.removeRow(fila);
 		
-		//borro las filas de la tablaMateriasDisponibles
-		for (int fila = modeloTablaMateriasDisponibles.getRowCount() -  1; fila >= 0; fila--)
-			modeloTablaMateriasDisponibles.removeRow(fila);
+		//borro las filas de la tablaAlumnosDisponibles
+		for (int fila = modeloTablaAlumnosDisponibles.getRowCount() -  1; fila >= 0; fila--)
+			modeloTablaAlumnosDisponibles.removeRow(fila);
 		
-		//cargo las materias  de listaMateriasInscriptas a la tablaMateriasInscriptas
+		//cargo los alumnos  de listaAlumnosInscriptas a la tablaAlumnosInscriptas
 		for (Inscripcion inscripcion : listaInscripciones) {
-			modeloTablaMateriasInscriptas.addRow(new Object[] {
+			modeloTablaAlumnosInscriptos.addRow(new Object[] {
 				inscripcion.getIdinscripcion(),
-				inscripcion.getMateria().getIdmateria(),
-				inscripcion.getMateria().getAnio(),
-				inscripcion.getMateria().getNombre(),
+				inscripcion.getAlumno().getIdalumno(),
+				inscripcion.getAlumno().getDni(),
+				inscripcion.getAlumno().getApellido(),
+				inscripcion.getAlumno().getNombre(),
 				inscripcion.getNota() } 
 			);
 		}
 	
-		//cargo las materias  de listaMateriasDisponibles a la tablaMateriasDisponibles
-		for (Materia materia : listaMateriasDisponibles) {
-			modeloTablaMateriasDisponibles.addRow(new Object[] {
-				materia.getIdmateria(),
-				materia.getAnio(),
-				materia.getNombre(),
-				materia.getEstado() } 
+		//cargo los alumnos  de listaAlumnosDisponibles a la tablaAlumnosDisponibles
+		for (Alumno alumno : listaAlumnosDisponibles) {
+			modeloTablaAlumnosDisponibles.addRow(new Object[] {
+				alumno.getIdalumno(),
+				alumno.getDni(),
+				alumno.getApellido(),
+				alumno.getNombre(),
+				alumno.getEstado() } 
 			);
 		}
 
 		//como no hay fila seleccionada en la tablaMateriasInscriptas, deshabilito el botón Desinscribirse
-		if (tablaMateriasInscriptas.getSelectedRow() == -1) // si no hay alguna fila seleccionada
+		if (tablaAlumnosInscriptos.getSelectedRow() == -1) // si no hay alguna fila seleccionada
 			btnDesinscribirse.setEnabled(false); // deshabilito el botón de Desinscribir
 		else //hay una fila seleccionada
 			btnDesinscribirse.setEnabled(true); // deshabilito el botón de Desinscribir
         
 		//como no hay fila seleccionada tablaMateriasDisponibles, deshabilito el botón Inscribirse
-		if (tablaMateriasDisponibles.getSelectedRow() == -1) // si no hay alguna fila seleccionada
+		if (tablaAlumnosDisponibles.getSelectedRow() == -1) // si no hay alguna fila seleccionada
 			btnInscribirse.setEnabled(false); // deshabilito el botón de Inscribirse
 		else //hay una fila seleccionada
 			btnInscribirse.setEnabled(true); // deshabilito el botón de Inscribirse
-	}//cargarTablaMaterias
+	}//cargarTablaAlumnosInscriptosYDisponibles
 	
 	
 	
@@ -143,9 +143,9 @@ public class GestionInscripciones extends javax.swing.JInternalFrame {
 	 * inscriptas y disponibles de ese alumno.
 	 * @param idAlumno 
 	 */
-	private void cargarListaMaterias(int idAlumno){
-		listaInscripciones = inscripcionData.getListaInscripcionesDelAlumno(idAlumno);
-		listaMateriasDisponibles = inscripcionData.getListaMateriasDisponiblesXAlumno(idAlumno);
+	private void cargarListaAlumnos(int idMateria){
+		listaInscripciones = inscripcionData.getListaInscripcionesDelAlumno(idMateria);
+		listaAlumnosDisponibles = inscripcionData.getListaAlumnosDisponiblesXMateria(idMateria);
 	}// cargarListaMaterias
 
         
@@ -154,13 +154,13 @@ public class GestionInscripciones extends javax.swing.JInternalFrame {
 	/**
 	 * como no hay ningun alumno seleccionado, borra los datos de las tablas de materias.
 	 */
-	private void borrarTablaMaterias(){
+	private void borrarTablaAlumnosInscriptosYDisponibles(){
 		//borro las filas de la tabla de materias inscriptas
-		for (int fila = modeloTablaMateriasInscriptas.getRowCount() -  1; fila >= 0; fila--)
-	modeloTablaMateriasInscriptas.removeRow(fila);
+		for (int fila = modeloTablaAlumnosInscriptos.getRowCount() -  1; fila >= 0; fila--)
+			modeloTablaAlumnosInscriptos.removeRow(fila);
 		//borro las filas de la tabla de materias disponibles
-		for (int fila = modeloTablaMateriasDisponibles.getRowCount() -  1; fila >= 0; fila--)
-	modeloTablaMateriasDisponibles.removeRow(fila);
+		for (int fila = modeloTablaAlumnosDisponibles.getRowCount() -  1; fila >= 0; fila--)
+			modeloTablaAlumnosDisponibles.removeRow(fila);
 	}// borrarTablaMaterias
 
 		
@@ -168,19 +168,19 @@ public class GestionInscripciones extends javax.swing.JInternalFrame {
 		
 	
 	/**
-	 * Busca al alumno por id, por dni, por apellido o por nombre (o por 
+	 * Busca la materia por id, por anio,  o por nombre (o por 
 	 * combinación de dichos campos). 
 	 * El criterio para usar un campo en la búsqueda es que no esté en blanco. 
 	 * Es decir, si tiene datos, se buscará por ese dato. Por ejemplo, si puso 
-	 * el id, buscará por id. Si puso el dni, buscará por dni. 
-	 * Si puso el dni y Apellido, buscara por dni and apellido.
+	 * el id, buscará por id. Si puso el anio, buscará por anio. 
+	 * Si puso el anio y Nombre, buscara por anio and nombre.
 	 * 
 	 * @return devuelve true sio pudo usar algún criterio de búsqueda
 	 */
-	private boolean buscarAlumno(){ 
-		// cargo los campos de texto id, dni, apellido y nombre para buscar por esos criterior
-		int idAlumno, dni;
-		String apellido, nombre;
+	private boolean buscarMateria(){ 
+		// cargo los campos de texto id, anio y nombre para buscar por esos criterior
+		int idAlumno, anio;
+		String nombre;
 		
 		//idAlumno
 		try {
@@ -195,32 +195,30 @@ public class GestionInscripciones extends javax.swing.JInternalFrame {
 		
 		//dni
 		try {
-			if (txtDni.getText().isEmpty()) // si está vacío no se usa para buscar
-				dni = -1;
+			if (txtAnio.getText().isEmpty()) // si está vacío no se usa para buscar
+				anio = -1;
 			else
-				dni = Integer.valueOf(txtDni.getText()); // no vacío, participa del criterio de búsqueda
+				anio = Integer.valueOf(txtAnio.getText()); // no vacío, participa del criterio de búsqueda
 				
 		} catch (NumberFormatException e) {
-			JOptionPane.showMessageDialog(this, "El DNI debe ser un número válido", "DNI no válido", JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(this, "El Año debe ser un número válido", "Año no válido", JOptionPane.ERROR_MESSAGE);
 			return false;
 		}
 		
 		//apellido y nombre
-		apellido = txtApellido.getText();
 		nombre = txtNombre.getText();
 		
 		//testeo que hay al menos un criterio de búsqueda
-		if ( idAlumno==-1 && dni==-1 && apellido.isEmpty() && nombre.isEmpty()  )   {
+		if ( idAlumno==-1 && anio==-1 && nombre.isEmpty()  )   {
 			JOptionPane.showMessageDialog(this, "Debe ingresar algún criterio para buscar", "Ningun criterio de búsqueda", JOptionPane.ERROR_MESSAGE);
 			return false;
 		} else { //todo Ok. Buscar por alguno de los criterior de búsqueda
 			filtro.id = idAlumno;
-			filtro.dni = dni;
-			filtro.apellido = apellido;
+			filtro.anio = anio;
 			filtro.nombre = nombre;
 			filtro.estoyFiltrando = true;
-			cargarListaAlumnos();
-			cargarTablaAlumnos();
+			cargarListaMaterias();
+			cargarTablaMaterias();
 			setearFiltro();
 			return true; // pudo buscar
 		}
@@ -236,10 +234,8 @@ public class GestionInscripciones extends javax.swing.JInternalFrame {
 	private void limpiarCampos(){
 		//pongo los campos en blanco
 		txtId.setText("");
-		txtDni.setText("");
-		txtApellido.setText("");
+		txtAnio.setText("");
 		txtNombre.setText("");
-		// tablaAlumnos.removeRowSelectionInterval(0, tablaAlumnos.getRowCount()-1); //des-selecciono las filas de la tabla
 	} // limpiarCampos
 
 
@@ -250,48 +246,47 @@ public class GestionInscripciones extends javax.swing.JInternalFrame {
 	 * @param numfila el número de fila a cargar a los campos
 	 */
 	private void filaTabla2Campos(int numfila){
-		txtId.setText(tablaAlumnos.getValueAt(numfila, 0)+"");
-		txtDni.setText(tablaAlumnos.getValueAt(numfila, 1)+"");
-		txtApellido.setText((String)tablaAlumnos.getValueAt(numfila, 2));
-		txtNombre.setText((String)tablaAlumnos.getValueAt(numfila, 3));		
+		txtId.setText(tablaMaterias.getValueAt(numfila, 0)+"");
+		txtAnio.setText(tablaMaterias.getValueAt(numfila, 1)+"");
+		txtNombre.setText((String)tablaMaterias.getValueAt(numfila, 3));		
 	} //filaTabla2Campos
         
         
     /**
-	 * Devuelve el idAlumno de la fila seleccionada de la tabla de alumnos
+	 * Devuelve el idMateria de la fila seleccionada de la tabla de materias
 	 * @param numfila el número de fila a cargar a los campos
 	 */
-	private int filaTablaAlumnos2IdAlumno(int numfila){
-		return (Integer)tablaAlumnos.getValueAt(numfila, 0);			
+	private int filaTablaMaterias2IdMateria(int numfila){
+		return (Integer)tablaMaterias.getValueAt(numfila, 0);			
 	} //filaTabla2IdAlumno
 
 
     /**
-	 * Devuelve el idMateria de la fila seleccionada de la tabla de disponibles
+	 * Devuelve el idAlumno de la fila seleccionada de la tabla de disponibles
 	 * @param numfila el número de fila a cargar a los campos
 	 */
-	private int filaTablaDisponibles2IdMateria(int numfila){
-		return (Integer)tablaMateriasDisponibles.getValueAt(numfila, 0);			
-	} //filaTablaDisponibles2IdMateria
+	private int filaTablaAlumnosDisponibles2IdAlumnos(int numfila){
+		return (Integer)tablaAlumnosDisponibles.getValueAt(numfila, 0);			
+	} //filaTablaAlumnosDisponibles2IdAlumno
 	
 	
 	
 	/**
-	 * Devuelve el idMateria de la fila seleccionada de la tabla de inscriptos
+	 * Devuelve el idAlumno de la fila seleccionada de la tabla de inscriptos
 	 * @param numfila el número de fila a cargar a los campos
 	 */
-	private int filaTablaInscriptas2IdMateria(int numfila){
-		return (Integer)tablaMateriasInscriptas.getValueAt(numfila, 1);			
-	} //filaTablaInscriptas2IdMateria
+	private int filaTablaAlumnosInscriptos2IdAlumno(int numfila){
+		return (Integer)tablaAlumnosInscriptos.getValueAt(numfila, 1);			
+	} //filaTablaAlummnosInscriptos2IdAlumno
 	
-	private int filaTablaInscriptas2IdInscripcion(int numfila){
-		return (Integer)tablaMateriasInscriptas.getValueAt(numfila, 0);			
-	} //filaTablaInscriptas2IdMateria
+	private int filaTablaAlumnosInscriptos2IdInscripcion(int numfila){
+		return (Integer)tablaAlumnosInscriptos.getValueAt(numfila, 0);			
+	} //filaTablaAlumnosInscriptos2IdInscripcion
 	
 	
-	private double filaTablaInscriptas2Nota(int numfila){
-		return (Double)tablaMateriasInscriptas.getValueAt(numfila, 4);			
-	} //filaTablaInscriptas2IdMateria
+	private double filaTablaAlumnosInscriptos2Nota(int numfila){
+		return (Double)tablaAlumnosInscriptos.getValueAt(numfila, 5);			
+	} //filaTablaAlumnosInscriptos2Nota
 	
 	
 
@@ -301,7 +296,7 @@ public class GestionInscripciones extends javax.swing.JInternalFrame {
 	*/
 	private void setearFiltro(){
 			//cambio el titulo de la tabla y color panel de tabla de Alumnos para que muestre que está filtrado
-			lblTituloTablaAlumnos.setText("Listado de alumnos filtrado por búsqueda");
+			lblTituloTablaAlumnos.setText("Listado de materias filtradas por búsqueda");
 			panelTablaAlumnos.setBackground(new Color(255, 51, 51));
 			btnResetearFiltro.setEnabled(true);
 			filtro.estoyFiltrando = true;
@@ -315,7 +310,7 @@ public class GestionInscripciones extends javax.swing.JInternalFrame {
 	private void resetearFiltro(){
 			//cambio el titulo de la tabla y color panel de tabla para que muestre que no está filtrado
 			//cambio el titulo de la tabla y color panel de tabla para que muestre que está filtrado
-			lblTituloTablaAlumnos.setText("Listado de alumnos");
+			lblTituloTablaAlumnos.setText("Listado de materias");
 			panelTablaAlumnos.setBackground(new Color(153, 153, 255));
 			btnResetearFiltro.setEnabled(false);
 			filtro.estoyFiltrando = false;
@@ -348,24 +343,23 @@ public class GestionInscripciones extends javax.swing.JInternalFrame {
         jLabel2 = new javax.swing.JLabel();
         panelTablaAlumnos = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
-        tablaAlumnos = new javax.swing.JTable();
+        tablaMaterias = new javax.swing.JTable();
         lblTituloTablaAlumnos = new javax.swing.JLabel();
         btnResetearFiltro = new javax.swing.JButton();
         panelTablaMateriasInscriptas = new javax.swing.JPanel();
         jScrollPane2 = new javax.swing.JScrollPane();
-        tablaMateriasInscriptas = new javax.swing.JTable();
+        tablaAlumnosInscriptos = new javax.swing.JTable();
         lblTituloTabla1 = new javax.swing.JLabel();
         panelTablaMateriasDisponibles = new javax.swing.JPanel();
         jScrollPane3 = new javax.swing.JScrollPane();
-        tablaMateriasDisponibles = new javax.swing.JTable();
+        tablaAlumnosDisponibles = new javax.swing.JTable();
         lblTituloTabla2 = new javax.swing.JLabel();
         btnInscribirse = new javax.swing.JButton();
         btnDesinscribirse = new javax.swing.JButton();
         campos = new javax.swing.JPanel();
         txtId = new javax.swing.JTextField();
-        txtDni = new javax.swing.JTextField();
+        txtAnio = new javax.swing.JTextField();
         txtNombre = new javax.swing.JTextField();
-        txtApellido = new javax.swing.JTextField();
 
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
@@ -390,7 +384,7 @@ public class GestionInscripciones extends javax.swing.JInternalFrame {
             }
         });
 
-        cboxOrden.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "por Id", "por DNI", "por Apellido y nombre" }));
+        cboxOrden.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "por Id", "por Año", "por Nombre" }));
         cboxOrden.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 cboxOrdenActionPerformed(evt);
@@ -411,9 +405,9 @@ public class GestionInscripciones extends javax.swing.JInternalFrame {
                 .addGroup(botoneraLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel2)
                     .addComponent(cboxOrden, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 212, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 146, Short.MAX_VALUE)
                 .addComponent(btnSalir)
-                .addContainerGap())
+                .addGap(19, 19, 19))
         );
         botoneraLayout.setVerticalGroup(
             botoneraLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -432,23 +426,23 @@ public class GestionInscripciones extends javax.swing.JInternalFrame {
                 .addGap(16, 16, 16))
         );
 
-        getContentPane().add(botonera, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 404, 625, 68));
+        getContentPane().add(botonera, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 404, 520, 68));
 
         panelTablaAlumnos.setBackground(new java.awt.Color(153, 153, 255));
 
-        tablaAlumnos.setModel(new javax.swing.table.DefaultTableModel(
+        tablaMaterias.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
 
             },
             new String [] {
-                "Id", "DNI", "Apellido", "Nombre", "Nacimiento", "Activo"
+                "Id", "Año", "Nombre", "Activo"
             }
         ) {
             Class[] types = new Class [] {
-                java.lang.Integer.class, java.lang.Integer.class, java.lang.String.class, java.lang.String.class, java.lang.Object.class, java.lang.Boolean.class
+                java.lang.Integer.class, java.lang.Integer.class, java.lang.String.class, java.lang.Boolean.class
             };
             boolean[] canEdit = new boolean [] {
-                false, false, false, false, false, false
+                false, false, false, false
             };
 
             public Class getColumnClass(int columnIndex) {
@@ -459,16 +453,22 @@ public class GestionInscripciones extends javax.swing.JInternalFrame {
                 return canEdit [columnIndex];
             }
         });
-        tablaAlumnos.getTableHeader().setReorderingAllowed(false);
-        tablaAlumnos.addMouseListener(new java.awt.event.MouseAdapter() {
+        tablaMaterias.getTableHeader().setReorderingAllowed(false);
+        tablaMaterias.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
-                tablaAlumnosMouseClicked(evt);
+                tablaMateriasMouseClicked(evt);
             }
         });
-        jScrollPane1.setViewportView(tablaAlumnos);
+        jScrollPane1.setViewportView(tablaMaterias);
+        if (tablaMaterias.getColumnModel().getColumnCount() > 0) {
+            tablaMaterias.getColumnModel().getColumn(0).setPreferredWidth(10);
+            tablaMaterias.getColumnModel().getColumn(1).setPreferredWidth(10);
+            tablaMaterias.getColumnModel().getColumn(2).setPreferredWidth(150);
+            tablaMaterias.getColumnModel().getColumn(3).setPreferredWidth(10);
+        }
 
         lblTituloTablaAlumnos.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
-        lblTituloTablaAlumnos.setText("Listado de Alumnos");
+        lblTituloTablaAlumnos.setText("Listado de Materias");
         lblTituloTablaAlumnos.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
 
         btnResetearFiltro.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
@@ -486,14 +486,15 @@ public class GestionInscripciones extends javax.swing.JInternalFrame {
         panelTablaAlumnosLayout.setHorizontalGroup(
             panelTablaAlumnosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(panelTablaAlumnosLayout.createSequentialGroup()
-                .addContainerGap()
                 .addGroup(panelTablaAlumnosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 605, Short.MAX_VALUE)
                     .addGroup(panelTablaAlumnosLayout.createSequentialGroup()
-                        .addGap(8, 8, 8)
-                        .addComponent(lblTituloTablaAlumnos, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGap(18, 18, 18)
+                        .addComponent(lblTituloTablaAlumnos, javax.swing.GroupLayout.DEFAULT_SIZE, 347, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(btnResetearFiltro)))
+                        .addComponent(btnResetearFiltro))
+                    .addGroup(panelTablaAlumnosLayout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(jScrollPane1)))
                 .addContainerGap())
         );
         panelTablaAlumnosLayout.setVerticalGroup(
@@ -507,23 +508,23 @@ public class GestionInscripciones extends javax.swing.JInternalFrame {
                 .addContainerGap())
         );
 
-        getContentPane().add(panelTablaAlumnos, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 625, 328));
+        getContentPane().add(panelTablaAlumnos, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 520, 328));
 
         panelTablaMateriasInscriptas.setBackground(new java.awt.Color(153, 153, 255));
 
-        tablaMateriasInscriptas.setModel(new javax.swing.table.DefaultTableModel(
+        tablaAlumnosInscriptos.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
 
             },
             new String [] {
-                "Id inscrip", "Id materia", "Año", "Nombre", "Nota"
+                "Id inscrip", "Id alumno", "DNI", "Apellido", "Nombre", "Nota"
             }
         ) {
             Class[] types = new Class [] {
-                java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.String.class, java.lang.Double.class
+                java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.String.class, java.lang.String.class, java.lang.Double.class
             };
             boolean[] canEdit = new boolean [] {
-                false, false, false, false, true
+                false, false, false, false, false, true
             };
 
             public Class getColumnClass(int columnIndex) {
@@ -534,28 +535,29 @@ public class GestionInscripciones extends javax.swing.JInternalFrame {
                 return canEdit [columnIndex];
             }
         });
-        tablaMateriasInscriptas.getTableHeader().setReorderingAllowed(false);
-        tablaMateriasInscriptas.addMouseListener(new java.awt.event.MouseAdapter() {
+        tablaAlumnosInscriptos.getTableHeader().setReorderingAllowed(false);
+        tablaAlumnosInscriptos.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
-                tablaMateriasInscriptasMouseClicked(evt);
+                tablaAlumnosInscriptosMouseClicked(evt);
             }
         });
-        tablaMateriasInscriptas.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
+        tablaAlumnosInscriptos.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
             public void propertyChange(java.beans.PropertyChangeEvent evt) {
-                tablaMateriasInscriptasPropertyChange(evt);
+                tablaAlumnosInscriptosPropertyChange(evt);
             }
         });
-        jScrollPane2.setViewportView(tablaMateriasInscriptas);
-        if (tablaMateriasInscriptas.getColumnModel().getColumnCount() > 0) {
-            tablaMateriasInscriptas.getColumnModel().getColumn(0).setPreferredWidth(15);
-            tablaMateriasInscriptas.getColumnModel().getColumn(1).setPreferredWidth(10);
-            tablaMateriasInscriptas.getColumnModel().getColumn(2).setPreferredWidth(10);
-            tablaMateriasInscriptas.getColumnModel().getColumn(3).setPreferredWidth(150);
-            tablaMateriasInscriptas.getColumnModel().getColumn(4).setPreferredWidth(10);
+        jScrollPane2.setViewportView(tablaAlumnosInscriptos);
+        if (tablaAlumnosInscriptos.getColumnModel().getColumnCount() > 0) {
+            tablaAlumnosInscriptos.getColumnModel().getColumn(0).setPreferredWidth(10);
+            tablaAlumnosInscriptos.getColumnModel().getColumn(1).setPreferredWidth(10);
+            tablaAlumnosInscriptos.getColumnModel().getColumn(2).setPreferredWidth(10);
+            tablaAlumnosInscriptos.getColumnModel().getColumn(3).setPreferredWidth(100);
+            tablaAlumnosInscriptos.getColumnModel().getColumn(4).setPreferredWidth(100);
+            tablaAlumnosInscriptos.getColumnModel().getColumn(5).setPreferredWidth(10);
         }
 
         lblTituloTabla1.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
-        lblTituloTabla1.setText("Materias en curso");
+        lblTituloTabla1.setText("Alumnos inscriptos");
         lblTituloTabla1.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
 
         javax.swing.GroupLayout panelTablaMateriasInscriptasLayout = new javax.swing.GroupLayout(panelTablaMateriasInscriptas);
@@ -564,7 +566,7 @@ public class GestionInscripciones extends javax.swing.JInternalFrame {
             panelTablaMateriasInscriptasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(panelTablaMateriasInscriptasLayout.createSequentialGroup()
                 .addGap(18, 18, 18)
-                .addComponent(lblTituloTabla1, javax.swing.GroupLayout.DEFAULT_SIZE, 297, Short.MAX_VALUE)
+                .addComponent(lblTituloTabla1, javax.swing.GroupLayout.DEFAULT_SIZE, 407, Short.MAX_VALUE)
                 .addGap(155, 155, 155))
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelTablaMateriasInscriptasLayout.createSequentialGroup()
                 .addContainerGap()
@@ -581,23 +583,23 @@ public class GestionInscripciones extends javax.swing.JInternalFrame {
                 .addContainerGap())
         );
 
-        getContentPane().add(panelTablaMateriasInscriptas, new org.netbeans.lib.awtextra.AbsoluteConstraints(635, 0, 470, -1));
+        getContentPane().add(panelTablaMateriasInscriptas, new org.netbeans.lib.awtextra.AbsoluteConstraints(525, 0, 580, -1));
 
         panelTablaMateriasDisponibles.setBackground(new java.awt.Color(153, 153, 255));
 
-        tablaMateriasDisponibles.setModel(new javax.swing.table.DefaultTableModel(
+        tablaAlumnosDisponibles.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
 
             },
             new String [] {
-                "Id", "Año", "Nombre", "Activo"
+                "Id", "DNI", "Apellido", "Nombre", "Activo"
             }
         ) {
             Class[] types = new Class [] {
-                java.lang.Integer.class, java.lang.Integer.class, java.lang.String.class, java.lang.Boolean.class
+                java.lang.Integer.class, java.lang.Integer.class, java.lang.String.class, java.lang.String.class, java.lang.Boolean.class
             };
             boolean[] canEdit = new boolean [] {
-                true, true, false, false
+                false, false, false, false, false
             };
 
             public Class getColumnClass(int columnIndex) {
@@ -608,22 +610,23 @@ public class GestionInscripciones extends javax.swing.JInternalFrame {
                 return canEdit [columnIndex];
             }
         });
-        tablaMateriasDisponibles.getTableHeader().setReorderingAllowed(false);
-        tablaMateriasDisponibles.addMouseListener(new java.awt.event.MouseAdapter() {
+        tablaAlumnosDisponibles.getTableHeader().setReorderingAllowed(false);
+        tablaAlumnosDisponibles.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
-                tablaMateriasDisponiblesMouseClicked(evt);
+                tablaAlumnosDisponiblesMouseClicked(evt);
             }
         });
-        jScrollPane3.setViewportView(tablaMateriasDisponibles);
-        if (tablaMateriasDisponibles.getColumnModel().getColumnCount() > 0) {
-            tablaMateriasDisponibles.getColumnModel().getColumn(0).setPreferredWidth(10);
-            tablaMateriasDisponibles.getColumnModel().getColumn(1).setPreferredWidth(10);
-            tablaMateriasDisponibles.getColumnModel().getColumn(2).setPreferredWidth(150);
-            tablaMateriasDisponibles.getColumnModel().getColumn(3).setPreferredWidth(10);
+        jScrollPane3.setViewportView(tablaAlumnosDisponibles);
+        if (tablaAlumnosDisponibles.getColumnModel().getColumnCount() > 0) {
+            tablaAlumnosDisponibles.getColumnModel().getColumn(0).setPreferredWidth(10);
+            tablaAlumnosDisponibles.getColumnModel().getColumn(1).setPreferredWidth(10);
+            tablaAlumnosDisponibles.getColumnModel().getColumn(2).setPreferredWidth(100);
+            tablaAlumnosDisponibles.getColumnModel().getColumn(3).setPreferredWidth(100);
+            tablaAlumnosDisponibles.getColumnModel().getColumn(4).setPreferredWidth(10);
         }
 
         lblTituloTabla2.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
-        lblTituloTabla2.setText("Materias disponibles");
+        lblTituloTabla2.setText("Alumnos a inscribir");
         lblTituloTabla2.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
 
         javax.swing.GroupLayout panelTablaMateriasDisponiblesLayout = new javax.swing.GroupLayout(panelTablaMateriasDisponibles);
@@ -632,11 +635,11 @@ public class GestionInscripciones extends javax.swing.JInternalFrame {
             panelTablaMateriasDisponiblesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(panelTablaMateriasDisponiblesLayout.createSequentialGroup()
                 .addGap(18, 18, 18)
-                .addComponent(lblTituloTabla2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(lblTituloTabla2, javax.swing.GroupLayout.DEFAULT_SIZE, 407, Short.MAX_VALUE)
                 .addGap(155, 155, 155))
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelTablaMateriasDisponiblesLayout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap()
+                .addComponent(jScrollPane3)
                 .addContainerGap())
         );
         panelTablaMateriasDisponiblesLayout.setVerticalGroup(
@@ -649,7 +652,7 @@ public class GestionInscripciones extends javax.swing.JInternalFrame {
                 .addContainerGap())
         );
 
-        getContentPane().add(panelTablaMateriasDisponibles, new org.netbeans.lib.awtextra.AbsoluteConstraints(635, 225, 470, -1));
+        getContentPane().add(panelTablaMateriasDisponibles, new org.netbeans.lib.awtextra.AbsoluteConstraints(525, 225, 580, -1));
 
         btnInscribirse.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         btnInscribirse.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/flecha_arriba16x16.png"))); // NOI18N
@@ -678,14 +681,11 @@ public class GestionInscripciones extends javax.swing.JInternalFrame {
         txtId.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         txtId.setBorder(javax.swing.BorderFactory.createTitledBorder("Id"));
 
-        txtDni.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
-        txtDni.setBorder(javax.swing.BorderFactory.createTitledBorder("DNI"));
+        txtAnio.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+        txtAnio.setBorder(javax.swing.BorderFactory.createTitledBorder("Año"));
 
         txtNombre.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         txtNombre.setBorder(javax.swing.BorderFactory.createTitledBorder("Nombre"));
-
-        txtApellido.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
-        txtApellido.setBorder(javax.swing.BorderFactory.createTitledBorder("Apellido"));
 
         javax.swing.GroupLayout camposLayout = new javax.swing.GroupLayout(campos);
         campos.setLayout(camposLayout);
@@ -695,11 +695,9 @@ public class GestionInscripciones extends javax.swing.JInternalFrame {
                 .addContainerGap()
                 .addComponent(txtId, javax.swing.GroupLayout.PREFERRED_SIZE, 57, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(txtDni, javax.swing.GroupLayout.PREFERRED_SIZE, 107, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(txtAnio, javax.swing.GroupLayout.PREFERRED_SIZE, 107, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(txtApellido, javax.swing.GroupLayout.PREFERRED_SIZE, 205, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 11, Short.MAX_VALUE)
-                .addComponent(txtNombre, javax.swing.GroupLayout.PREFERRED_SIZE, 205, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(txtNombre, javax.swing.GroupLayout.PREFERRED_SIZE, 316, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
         camposLayout.setVerticalGroup(
@@ -708,13 +706,12 @@ public class GestionInscripciones extends javax.swing.JInternalFrame {
                 .addContainerGap()
                 .addGroup(camposLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(txtId)
-                    .addComponent(txtDni, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(txtNombre, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(txtApellido, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(txtAnio, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(txtNombre, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap())
         );
 
-        getContentPane().add(campos, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 334, 625, -1));
+        getContentPane().add(campos, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 334, 520, -1));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -723,7 +720,7 @@ public class GestionInscripciones extends javax.swing.JInternalFrame {
 	
 	
     private void btnBuscarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBuscarActionPerformed
-        buscarAlumno();
+        buscarMateria();
     }//GEN-LAST:event_btnBuscarActionPerformed
 
 	
@@ -738,43 +735,43 @@ public class GestionInscripciones extends javax.swing.JInternalFrame {
 	
     private void cboxOrdenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cboxOrdenActionPerformed
         if (cboxOrden.getSelectedIndex() == 0)
-			ordenacion = Ordenacion.PORIDALUMNO;
+			ordenacion = MateriaData.Ordenacion.PORIDMATERIA;
         else if (cboxOrden.getSelectedIndex() == 1)
-			ordenacion = Ordenacion.PORDNI;
+			ordenacion = MateriaData.Ordenacion.PORANIO;
         else if (cboxOrden.getSelectedIndex() == 2)
-			ordenacion = Ordenacion.PORAPYNO;
+			ordenacion = MateriaData.Ordenacion.PORNOMBRE;
         else // por las dudas que no eligio uno correcto
-			ordenacion = Ordenacion.PORIDALUMNO;
+			ordenacion = MateriaData.Ordenacion.PORIDMATERIA;
 		
-		cargarListaAlumnos();
-        cargarTablaAlumnos();
+		cargarListaMaterias();
+        cargarTablaMaterias();
     }//GEN-LAST:event_cboxOrdenActionPerformed
 
 	
 	
 	
-    private void tablaAlumnosMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tablaAlumnosMouseClicked
+    private void tablaMateriasMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tablaMateriasMouseClicked
         //tabla.addRowSelectionInterval(filaTabla, filaTabla); //selecciono esa fila de la tabla
-        if (tablaAlumnos.getSelectedRow() != -1){ // si hay alguna fila seleccionada
-			borrarTablaMaterias();
+        if (tablaMaterias.getSelectedRow() != -1){ // si hay alguna fila seleccionada
+			borrarTablaAlumnosInscriptosYDisponibles();
         }
-        int numfila = tablaAlumnos.getSelectedRow();
+        int numfila = tablaMaterias.getSelectedRow();
         if (numfila != -1) {
             
-            //mostramos las tablas de materias de acuerdo al alumno seleccionado
-            int idAlumno = filaTablaAlumnos2IdAlumno(numfila); // saco el idAlumno de la fila seleccionadad de la tablaAlumnos
-			cargarListaMaterias(idAlumno);  // cargamos las listas de materias inscriptas y disponibles de ese alumno
-			cargarTablaMaterias();			// las mostramos en las respectivas tablas
+            //mostramos las tablas de alumnos de acuerdo la materia seleccionado
+            int idMateria = filaTablaMaterias2IdMateria(numfila); // saco el idMateria de la fila seleccionadad de la tablaMaterias
+			cargarListaAlumnos(idMateria);  // cargamos las listas de alumnos inscriptas y disponibles de esa materia
+			cargarTablaAlumnosInscriptosYDisponibles();			// las mostramos en las respectivas tablas
         }
-    }//GEN-LAST:event_tablaAlumnosMouseClicked
+    }//GEN-LAST:event_tablaMateriasMouseClicked
 
 	
 	
 	
     private void btnResetearFiltroActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnResetearFiltroActionPerformed
         resetearFiltro();
-        cargarListaAlumnos();
-        cargarTablaAlumnos();
+        cargarListaMaterias();
+        cargarTablaMaterias();
         limpiarCampos();
     }//GEN-LAST:event_btnResetearFiltroActionPerformed
 
@@ -782,35 +779,35 @@ public class GestionInscripciones extends javax.swing.JInternalFrame {
 	
 	
 	
-    private void tablaMateriasInscriptasMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tablaMateriasInscriptasMouseClicked
-        if (tablaMateriasInscriptas.getSelectedRow() != -1){ // si hay alguna fila seleccionada
+    private void tablaAlumnosInscriptosMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tablaAlumnosInscriptosMouseClicked
+        if (tablaAlumnosInscriptos.getSelectedRow() != -1){ // si hay alguna fila seleccionada
 			btnDesinscribirse.setEnabled(false); // deshabilito botón Desinscribirse.
         }
-        int numfila = tablaMateriasInscriptas.getSelectedRow();
+        int numfila = tablaAlumnosInscriptos.getSelectedRow();
         if (numfila != -1) { //si hay alguna fila seleccionada en la tabla de materias disponibles
 			btnDesinscribirse.setEnabled(true);
         } 
-    }//GEN-LAST:event_tablaMateriasInscriptasMouseClicked
+    }//GEN-LAST:event_tablaAlumnosInscriptosMouseClicked
 
 	
 	
 	
     private void btnDesinscribirseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDesinscribirseActionPerformed
-		if (tablaMateriasInscriptas.getSelectedRow() != -1){ // si hay alguna fila seleccionada
+		if (tablaAlumnosInscriptos.getSelectedRow() != -1){ // si hay alguna fila seleccionada
 			btnDesinscribirse.setEnabled(false); // deshabilito botón Desinscribirse.
         }
-        int numfilaInsc = tablaMateriasInscriptas.getSelectedRow();
+        int numfilaInsc = tablaAlumnosInscriptos.getSelectedRow();
         if (numfilaInsc != -1) { //si hay alguna fila seleccionada en la tabla de materias disponibles
-			int idInscripcion = filaTablaInscriptas2IdInscripcion(numfilaInsc);//averiguamos el idMateria
+			int idInscripcion = filaTablaAlumnosInscriptos2IdInscripcion(numfilaInsc);//averiguamos el idMateria
 			
-		    int numfilaAlumno = tablaAlumnos.getSelectedRow();
-			if (numfilaAlumno != -1) {
-				int idAlumno = filaTablaAlumnos2IdAlumno(numfilaAlumno);
+		    int numfilaMateria = tablaMaterias.getSelectedRow();
+			if (numfilaMateria != -1) {
+				int idMateria = filaTablaMaterias2IdMateria(numfilaMateria);
 				inscripcionData.bajaInscripcion(idInscripcion); // Lo inscribimos
 				
 				//actualizamos las listas y tablas de materias
-				cargarListaMaterias(idAlumno);
-				cargarTablaMaterias();
+				cargarListaAlumnos(idMateria);
+				cargarTablaAlumnosInscriptosYDisponibles();
 			}
 		}
     }//GEN-LAST:event_btnDesinscribirseActionPerformed
@@ -819,7 +816,7 @@ public class GestionInscripciones extends javax.swing.JInternalFrame {
 	
 	
 	
-    private void tablaMateriasDisponiblesMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tablaMateriasDisponiblesMouseClicked
+    private void tablaAlumnosDisponiblesMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tablaAlumnosDisponiblesMouseClicked
         //tabla.addRowSelectionInterval(filaTabla, filaTabla); //selecciono esa fila de la tabla
         if (tablaMateriasDisponibles.getSelectedRow() != -1){ // si hay alguna fila seleccionada
 			btnInscribirse.setEnabled(false); // deshabilito botón Inscribirse.
@@ -828,7 +825,7 @@ public class GestionInscripciones extends javax.swing.JInternalFrame {
         if (numfila != -1) { //si hay alguna fila seleccionada en la tabla de materias disponibles
 			btnInscribirse.setEnabled(true);
         } 	
-    }//GEN-LAST:event_tablaMateriasDisponiblesMouseClicked
+    }//GEN-LAST:event_tablaAlumnosDisponiblesMouseClicked
 
 	
 	
@@ -850,12 +847,12 @@ public class GestionInscripciones extends javax.swing.JInternalFrame {
 				
 				//actualizamos las listas y tablas de materias
 				cargarListaMaterias(idAlumno);
-				cargarTablaMaterias();
+				cargarTablaAlumnosInscriptosYDisponibles();
          	}
 		}
     }//GEN-LAST:event_btnInscribirseActionPerformed
 
-    private void tablaMateriasInscriptasPropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_tablaMateriasInscriptasPropertyChange
+    private void tablaAlumnosInscriptosPropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_tablaAlumnosInscriptosPropertyChange
         //supuestamente cambio la nota
 		//System.out.println("CAMBIO LA NOTA!!!!!!!!!!");
 		if (tablaMateriasInscriptas.getEditingRow() == -1) { //si no hay nada editado devuelve -1
@@ -875,9 +872,9 @@ public class GestionInscripciones extends javax.swing.JInternalFrame {
 			}
 			//actualizamos las listas y tablas de materias
 			cargarListaMaterias(inscripcion.getAlumno().getIdalumno());
-			cargarTablaMaterias();
+			cargarTablaAlumnosInscriptosYDisponibles();
 		}
-    }//GEN-LAST:event_tablaMateriasInscriptasPropertyChange
+    }//GEN-LAST:event_tablaAlumnosInscriptosPropertyChange
 
 	
 	
@@ -906,11 +903,10 @@ public class GestionInscripciones extends javax.swing.JInternalFrame {
     private javax.swing.JPanel panelTablaAlumnos;
     private javax.swing.JPanel panelTablaMateriasDisponibles;
     private javax.swing.JPanel panelTablaMateriasInscriptas;
-    private javax.swing.JTable tablaAlumnos;
-    private javax.swing.JTable tablaMateriasDisponibles;
-    private javax.swing.JTable tablaMateriasInscriptas;
-    private javax.swing.JTextField txtApellido;
-    private javax.swing.JTextField txtDni;
+    private javax.swing.JTable tablaAlumnosDisponibles;
+    private javax.swing.JTable tablaAlumnosInscriptos;
+    private javax.swing.JTable tablaMaterias;
+    private javax.swing.JTextField txtAnio;
     private javax.swing.JTextField txtId;
     private javax.swing.JTextField txtNombre;
     // End of variables declaration//GEN-END:variables
