@@ -818,10 +818,10 @@ public class GestionInscripcionesMateria extends javax.swing.JInternalFrame {
 	
     private void tablaAlumnosDisponiblesMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tablaAlumnosDisponiblesMouseClicked
         //tabla.addRowSelectionInterval(filaTabla, filaTabla); //selecciono esa fila de la tabla
-        if (tablaMateriasDisponibles.getSelectedRow() != -1){ // si hay alguna fila seleccionada
+        if (tablaAlumnosDisponibles.getSelectedRow() != -1){ // si hay alguna fila seleccionada
 			btnInscribirse.setEnabled(false); // deshabilito botón Inscribirse.
         }
-        int numfila = tablaMateriasDisponibles.getSelectedRow();
+        int numfila = tablaAlumnosDisponibles.getSelectedRow();
         if (numfila != -1) { //si hay alguna fila seleccionada en la tabla de materias disponibles
 			btnInscribirse.setEnabled(true);
         } 	
@@ -833,20 +833,23 @@ public class GestionInscripcionesMateria extends javax.swing.JInternalFrame {
 	
 	
     private void btnInscribirseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnInscribirseActionPerformed
-        if (tablaMateriasDisponibles.getSelectedRow() != -1){ // si hay alguna fila seleccionada
+        if (tablaAlumnosDisponibles.getSelectedRow() != -1){ // si hay alguna fila seleccionada
 			btnInscribirse.setEnabled(false); // deshabilito botón Inscribirse.
         }
-        int numfilaDisp = tablaMateriasDisponibles.getSelectedRow();
+        int numfilaDisp = tablaAlumnosDisponibles.getSelectedRow();
         if (numfilaDisp != -1) { //si hay alguna fila seleccionada en la tabla de materias disponibles
-			int idMateria = filaTablaDisponibles2IdMateria(numfilaDisp);//averiguamos el idMateria
-			
-		    int numfilaAlumno = tablaAlumnos.getSelectedRow();
+			int idMateria = filaTablaAlumnosDisponibles2IdAlumnos(numfilaDisp);//averiguamos el idMateria
+			/**Hay un error al cargar la tabla de alumnos disponibles, muestra todos los alumnos,
+                        incluso los que están inscriptos a la materia seleccionada. Al querer inscribir un alumno, se lo selecciona de 
+                        la tabla inferior, pero lo que carga es el dato duplicado del alumno ya inscripto. Además sigue estando disponible
+                        en la tabla inferior.*/
+		    int numfilaAlumno = tablaMaterias.getSelectedRow();
 			if (numfilaAlumno != -1) {
-				int idAlumno = filaTablaAlumnos2IdAlumno(numfilaAlumno);
+				int idAlumno = filaTablaMaterias2IdMateria(numfilaAlumno);
 				inscripcionData.altaInscripcion(0.0, idAlumno, idMateria); // Lo inscribimos
-				
-				//actualizamos las listas y tablas de materias
-				cargarListaMaterias(idAlumno);
+				                      //  System.out.println("alumno a inscibir" + idAlumno);
+//				actualizamos las listas y tablas de materias
+				cargarListaAlumnos(idAlumno);
 				cargarTablaAlumnosInscriptosYDisponibles();
          	}
 		}
@@ -855,15 +858,15 @@ public class GestionInscripcionesMateria extends javax.swing.JInternalFrame {
     private void tablaAlumnosInscriptosPropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_tablaAlumnosInscriptosPropertyChange
         //supuestamente cambio la nota
 		//System.out.println("CAMBIO LA NOTA!!!!!!!!!!");
-		if (tablaMateriasInscriptas.getEditingRow() == -1) { //si no hay nada editado devuelve -1
+		if (tablaAlumnosInscriptos.getEditingRow() == -1) { //si no hay nada editado devuelve -1
 			// System.out.println("ERROR... NO HAY FILA Editandose");
 			return;
         }
-        int numfilaInsc = tablaMateriasInscriptas.getEditingRow();
+        int numfilaInsc = tablaAlumnosInscriptos.getEditingRow();
         if (numfilaInsc != -1) { //si hay alguna fila editandose en la tabla de materias disponibles
-			int idInscripcion = filaTablaInscriptas2IdInscripcion(numfilaInsc);//averiguamos el idinscripcion
+			int idInscripcion = filaTablaAlumnosInscriptos2IdInscripcion(numfilaInsc);//averiguamos el idinscripcion
 			Inscripcion inscripcion = inscripcionData.getInscripcion(idInscripcion); // obtengo la inscripcion
-			double nota = filaTablaInscriptas2Nota(numfilaInsc);
+			double nota = filaTablaAlumnosInscriptos2IdInscripcion(numfilaInsc);
 			if (nota < 0.0 || nota > 10.0) // si la nota no está bien, mensaje de error y vuelve a la nota anterior
 				JOptionPane.showMessageDialog(null, "Ingrese una nota válida (de 0 a 10)");
 			else { //actualizo la nota
@@ -871,7 +874,7 @@ public class GestionInscripcionesMateria extends javax.swing.JInternalFrame {
 				inscripcionData.modificarInscripcion(inscripcion);
 			}
 			//actualizamos las listas y tablas de materias
-			cargarListaMaterias(inscripcion.getAlumno().getIdalumno());
+			cargarListaAlumnos(inscripcion.getAlumno().getIdalumno());
 			cargarTablaAlumnosInscriptosYDisponibles();
 		}
     }//GEN-LAST:event_tablaAlumnosInscriptosPropertyChange
