@@ -2,7 +2,7 @@
 package vistas;
 
 import accesoadatos.AlumnoData;
-import accesoadatos.AlumnoData.Ordenacion;
+import accesoadatos.MateriaData.OrdenacionMateria;
 import accesoadatos.InscripcionData;
 import accesoadatos.MateriaData;
 import accesoadatos.Utils;
@@ -19,7 +19,7 @@ import javax.swing.table.DefaultTableModel;
  *
  * @author John David Molina Velarde, Leticia Mores, Enrique Germán Martínez, Carlos Eduardo Beltrán
  */
-public class GestionInscripcionesMateria extends javax.swing.JInternalFrame {
+public class CrudInscripcionesXMateria extends javax.swing.JInternalFrame {
 	DefaultTableModel modeloTablaMaterias, modeloTablaAlumnosInscriptos, modeloTablaAlumnosDisponibles;
 	public static List<Materia> listaMaterias;
     public static List<Inscripcion> listaInscripciones; //lista de inscripciones de un alumno
@@ -28,14 +28,14 @@ public class GestionInscripcionesMateria extends javax.swing.JInternalFrame {
     private final MateriaData materiaData;
     private final InscripcionData inscripcionData;
 	// private enum TipoEdicion {AGREGAR, MODIFICAR, BUSCAR};
-	private MateriaData.Ordenacion ordenacion = MateriaData.Ordenacion.PORIDMATERIA; // defino el tipo de orden por defecto 
+	private OrdenacionMateria ordenacion = OrdenacionMateria.PORIDMATERIA; // defino el tipo de orden por defecto 
 	private FiltroMaterias filtro = new FiltroMaterias();  //el filtro de búsqueda
 	
 
 	/**
 	 * Creates new form GestionInscripciones
 	 */
-	public GestionInscripcionesMateria() {
+	public CrudInscripcionesXMateria() {
 		initComponents();
 		alumnoData = new AlumnoData();
 		materiaData = new MateriaData();
@@ -144,7 +144,7 @@ public class GestionInscripcionesMateria extends javax.swing.JInternalFrame {
 	 * @param idAlumno 
 	 */
 	private void cargarListaAlumnos(int idMateria){
-		listaInscripciones = inscripcionData.getListaInscripcionesDelAlumno(idMateria);
+		listaInscripciones = inscripcionData.getListaInscripcionesDeLaMateria(idMateria);
 		listaAlumnosDisponibles = inscripcionData.getListaAlumnosDisponiblesXMateria(idMateria);
 	}// cargarListaMaterias
 
@@ -179,15 +179,15 @@ public class GestionInscripcionesMateria extends javax.swing.JInternalFrame {
 	 */
 	private boolean buscarMateria(){ 
 		// cargo los campos de texto id, anio y nombre para buscar por esos criterior
-		int idAlumno, anio;
+		int idMateria, anio;
 		String nombre;
 		
-		//idAlumno
+		//idMateria
 		try {
 			if (txtId.getText().isEmpty()) // si está vacío no se usa para buscar
-				idAlumno = -1;
+				idMateria = -1;
 			else
-				idAlumno = Integer.valueOf(txtId.getText()); //no vacío, participa del criterio de búsqueda
+				idMateria = Integer.valueOf(txtId.getText()); //no vacío, participa del criterio de búsqueda
 		} catch (NumberFormatException e) {
 			JOptionPane.showMessageDialog(this, "El Id debe ser un número válido", "Id no válido", JOptionPane.ERROR_MESSAGE);
 			return false;
@@ -209,11 +209,11 @@ public class GestionInscripcionesMateria extends javax.swing.JInternalFrame {
 		nombre = txtNombre.getText();
 		
 		//testeo que hay al menos un criterio de búsqueda
-		if ( idAlumno==-1 && anio==-1 && nombre.isEmpty()  )   {
+		if ( idMateria==-1 && anio==-1 && nombre.isEmpty()  )   {
 			JOptionPane.showMessageDialog(this, "Debe ingresar algún criterio para buscar", "Ningun criterio de búsqueda", JOptionPane.ERROR_MESSAGE);
 			return false;
 		} else { //todo Ok. Buscar por alguno de los criterior de búsqueda
-			filtro.id = idAlumno;
+			filtro.id = idMateria;
 			filtro.anio = anio;
 			filtro.nombre = nombre;
 			filtro.estoyFiltrando = true;
@@ -222,7 +222,7 @@ public class GestionInscripcionesMateria extends javax.swing.JInternalFrame {
 			setearFiltro();
 			return true; // pudo buscar
 		}
-	} //buscarAlumno
+	} //buscarMateria
 	
 
 	
@@ -248,7 +248,7 @@ public class GestionInscripcionesMateria extends javax.swing.JInternalFrame {
 	private void filaTabla2Campos(int numfila){
 		txtId.setText(tablaMaterias.getValueAt(numfila, 0)+"");
 		txtAnio.setText(tablaMaterias.getValueAt(numfila, 1)+"");
-		txtNombre.setText((String)tablaMaterias.getValueAt(numfila, 3));		
+		txtNombre.setText((String)tablaMaterias.getValueAt(numfila, 2));		
 	} //filaTabla2Campos
         
         
@@ -735,13 +735,13 @@ public class GestionInscripcionesMateria extends javax.swing.JInternalFrame {
 	
     private void cboxOrdenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cboxOrdenActionPerformed
         if (cboxOrden.getSelectedIndex() == 0)
-			ordenacion = MateriaData.Ordenacion.PORIDMATERIA;
+			ordenacion = MateriaData.OrdenacionMateria.PORIDMATERIA;
         else if (cboxOrden.getSelectedIndex() == 1)
-			ordenacion = MateriaData.Ordenacion.PORANIO;
+			ordenacion = MateriaData.OrdenacionMateria.PORANIO;
         else if (cboxOrden.getSelectedIndex() == 2)
-			ordenacion = MateriaData.Ordenacion.PORNOMBRE;
+			ordenacion = MateriaData.OrdenacionMateria.PORNOMBRE;
         else // por las dudas que no eligio uno correcto
-			ordenacion = MateriaData.Ordenacion.PORIDMATERIA;
+			ordenacion = MateriaData.OrdenacionMateria.PORIDMATERIA;
 		
 		cargarListaMaterias();
         cargarTablaMaterias();
@@ -784,7 +784,7 @@ public class GestionInscripcionesMateria extends javax.swing.JInternalFrame {
 			btnDesinscribirse.setEnabled(false); // deshabilito botón Desinscribirse.
         }
         int numfila = tablaAlumnosInscriptos.getSelectedRow();
-        if (numfila != -1) { //si hay alguna fila seleccionada en la tabla de materias disponibles
+        if (numfila != -1) { //si hay alguna fila seleccionada en la tabla de alumnos disponibles
 			btnDesinscribirse.setEnabled(true);
         } 
     }//GEN-LAST:event_tablaAlumnosInscriptosMouseClicked
@@ -797,7 +797,7 @@ public class GestionInscripcionesMateria extends javax.swing.JInternalFrame {
 			btnDesinscribirse.setEnabled(false); // deshabilito botón Desinscribirse.
         }
         int numfilaInsc = tablaAlumnosInscriptos.getSelectedRow();
-        if (numfilaInsc != -1) { //si hay alguna fila seleccionada en la tabla de materias disponibles
+        if (numfilaInsc != -1) { //si hay alguna fila seleccionada en la tabla de alumnos disponibles
 			int idInscripcion = filaTablaAlumnosInscriptos2IdInscripcion(numfilaInsc);//averiguamos el idMateria
 			
 		    int numfilaMateria = tablaMaterias.getSelectedRow();
@@ -837,19 +837,16 @@ public class GestionInscripcionesMateria extends javax.swing.JInternalFrame {
 			btnInscribirse.setEnabled(false); // deshabilito botón Inscribirse.
         }
         int numfilaDisp = tablaAlumnosDisponibles.getSelectedRow();
-        if (numfilaDisp != -1) { //si hay alguna fila seleccionada en la tabla de materias disponibles
-			int idMateria = filaTablaAlumnosDisponibles2IdAlumnos(numfilaDisp);//averiguamos el idMateria
-			/**Hay un error al cargar la tabla de alumnos disponibles, muestra todos los alumnos,
-                        incluso los que están inscriptos a la materia seleccionada. Al querer inscribir un alumno, se lo selecciona de 
-                        la tabla inferior, pero lo que carga es el dato duplicado del alumno ya inscripto. Además sigue estando disponible
-                        en la tabla inferior.*/
-		    int numfilaAlumno = tablaMaterias.getSelectedRow();
-			if (numfilaAlumno != -1) {
-				int idAlumno = filaTablaMaterias2IdMateria(numfilaAlumno);
+        if (numfilaDisp != -1) { //si hay alguna fila seleccionada en la tabla de alumnos disponibles
+			int idAlumno = filaTablaAlumnosDisponibles2IdAlumnos(numfilaDisp);//averiguamos el idMateria
+			
+		    int numfilaMateria = tablaMaterias.getSelectedRow();
+			if (numfilaMateria != -1) {
+				int idMateria = filaTablaMaterias2IdMateria(numfilaMateria);
 				inscripcionData.altaInscripcion(0.0, idAlumno, idMateria); // Lo inscribimos
 				                      //  System.out.println("alumno a inscibir" + idAlumno);
 //				actualizamos las listas y tablas de materias
-				cargarListaAlumnos(idAlumno);
+				cargarListaAlumnos(idMateria);
 				cargarTablaAlumnosInscriptosYDisponibles();
          	}
 		}
@@ -866,7 +863,7 @@ public class GestionInscripcionesMateria extends javax.swing.JInternalFrame {
         if (numfilaInsc != -1) { //si hay alguna fila editandose en la tabla de materias disponibles
 			int idInscripcion = filaTablaAlumnosInscriptos2IdInscripcion(numfilaInsc);//averiguamos el idinscripcion
 			Inscripcion inscripcion = inscripcionData.getInscripcion(idInscripcion); // obtengo la inscripcion
-			double nota = filaTablaAlumnosInscriptos2IdInscripcion(numfilaInsc);
+			double nota = filaTablaAlumnosInscriptos2Nota(numfilaInsc);
 			if (nota < 0.0 || nota > 10.0) // si la nota no está bien, mensaje de error y vuelve a la nota anterior
 				JOptionPane.showMessageDialog(null, "Ingrese una nota válida (de 0 a 10)");
 			else { //actualizo la nota

@@ -85,7 +85,7 @@ public class PantallaPpal extends javax.swing.JFrame {
 
         jMenu3.setText("Inscripciones");
 
-        menuGestionInscripcionesporAlumno.setText("Gestión de inscripciones Alumnos por materia");
+        menuGestionInscripcionesporAlumno.setText("Gestión de inscripciones por Alumnos");
         menuGestionInscripcionesporAlumno.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 menuGestionInscripcionesporAlumnoActionPerformed(evt);
@@ -93,7 +93,7 @@ public class PantallaPpal extends javax.swing.JFrame {
         });
         jMenu3.add(menuGestionInscripcionesporAlumno);
 
-        menuGestionInscripcionesporMateria.setText("Gestión de inscripciones Materias por alumno");
+        menuGestionInscripcionesporMateria.setText("Gestión de inscripciones por Materias");
         menuGestionInscripcionesporMateria.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 menuGestionInscripcionesporMateriaActionPerformed(evt);
@@ -139,7 +139,7 @@ public class PantallaPpal extends javax.swing.JFrame {
         escritorio.removeAll(); // cierro todas las ventanas del escritorio
 		escritorio.repaint();
 		
-		GestionAlumnos ga = new GestionAlumnos(); // creo un internal Frame
+		CrudAlumnos ga = new CrudAlumnos(); // creo un internal Frame
 		ga.setVisible(true); // lo pongo visible
 		
 		escritorio.add(ga); // lo pongo en el escritorio
@@ -155,7 +155,7 @@ public class PantallaPpal extends javax.swing.JFrame {
         	escritorio.removeAll(); // cierro todas las ventanas del escritorio
 		escritorio.repaint();
 		
-		GestionMaterias gm = new GestionMaterias(); // creo un internal Frame
+		CrudMaterias gm = new CrudMaterias(); // creo un internal Frame
 		gm.setVisible(true); // lo pongo visible
 		
 		escritorio.add(gm); // lo pongo en el escritorio
@@ -166,7 +166,7 @@ public class PantallaPpal extends javax.swing.JFrame {
         escritorio.removeAll(); // cierro todas las ventanas del escritorio
 		escritorio.repaint();
 		
-		GestionInscripciones gi = new GestionInscripciones(); // creo un internal Frame
+		CrudInscripcionesXAlumno gi = new CrudInscripcionesXAlumno(); // creo un internal Frame
 		gi.setVisible(true); // lo pongo visible
 		
 		escritorio.add(gi); // lo pongo en el escritorio
@@ -177,7 +177,7 @@ public class PantallaPpal extends javax.swing.JFrame {
         escritorio.removeAll(); // cierro todas las ventanas del escritorio
 		escritorio.repaint();
 		
-		GestionInscripcionesMateria gi = new GestionInscripcionesMateria(); // creo un internal Frame
+		CrudInscripcionesXMateria gi = new CrudInscripcionesXMateria(); // creo un internal Frame
 		gi.setVisible(true); // lo pongo visible
 		
 		escritorio.add(gi); // lo pongo en el escritorio

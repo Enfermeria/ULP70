@@ -33,7 +33,7 @@ import entidades.Materia;
  */
 public class AlumnoData {
 	ConexionMySQL conexion; //gestiona la conexión con la bd
-	public enum Ordenacion {PORIDALUMNO, PORDNI, PORAPYNO}; //tipo de ordenamiento
+	public enum OrdenacionAlumno {PORIDALUMNO, PORDNI, PORAPYNO}; //tipo de ordenamiento
 	
 	public AlumnoData() {
 		conexion = new ConexionMySQL();
@@ -188,7 +188,7 @@ public class AlumnoData {
 	 * @return la lista de alumnos
 	 */
 	public List<Alumno> getListaAlumnos(){ 
-		return getListaAlumnos(Ordenacion.PORIDALUMNO);
+		return getListaAlumnos(OrdenacionAlumno.PORIDALUMNO);
 	} // getListaAlumnos
 	
 	
@@ -197,14 +197,14 @@ public class AlumnoData {
 	 * @param ordenacion es el orden en el que se devolverán
 	 * @return devuelve la lista de alumnos
 	 */
-	public List<Alumno> getListaAlumnos(Ordenacion ordenacion){
+	public List<Alumno> getListaAlumnos(OrdenacionAlumno ordenacion){
 		ArrayList<Alumno> lista = new ArrayList();
 		String sql = "Select * from alumno";
 		
 		//defino orden
-		if (ordenacion == Ordenacion.PORIDALUMNO) 
+		if (ordenacion == OrdenacionAlumno.PORIDALUMNO) 
 			sql = sql + " Order by idalumno";
-		else if (ordenacion == Ordenacion.PORDNI)
+		else if (ordenacion == OrdenacionAlumno.PORDNI)
 			sql = sql + " Order by dni";
 		else 
 			sql = sql + " Order by apellido, nombre";
@@ -240,7 +240,7 @@ public class AlumnoData {
 	 * @param ordenacion es el orden en el que devolverá la lista
 	 * @return lista de alumnos que cumplen con el criterio de búsqueda
 	 */
-	public List<Alumno> getListaAlumnosXCriterioDeBusqueda(int idAlumno, int dni, String apellido, String nombre, Ordenacion ordenacion){ 
+	public List<Alumno> getListaAlumnosXCriterioDeBusqueda(int idAlumno, int dni, String apellido, String nombre, OrdenacionAlumno ordenacion){ 
 		ArrayList<Alumno> lista = new ArrayList();
 		String sql = "Select * from alumno";
 		if ( idAlumno != -1 || dni !=- 1 || ! apellido.isEmpty() || ! nombre.isEmpty() ) {
@@ -270,9 +270,9 @@ public class AlumnoData {
 		}
 		
 		//defino orden
-		if (ordenacion == Ordenacion.PORIDALUMNO) 
+		if (ordenacion == OrdenacionAlumno.PORIDALUMNO) 
 			sql = sql + " Order by idalumno";
-		else if (ordenacion == Ordenacion.PORDNI)
+		else if (ordenacion == OrdenacionAlumno.PORDNI)
 			sql = sql + " Order by dni";
 		else 
 			sql = sql + " Order by apellido, nombre";		

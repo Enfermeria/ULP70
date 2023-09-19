@@ -2,7 +2,7 @@
 package vistas;
 
 import accesoadatos.MateriaData;
-import accesoadatos.MateriaData.Ordenacion;
+import accesoadatos.MateriaData.OrdenacionMateria;
 import entidades.Materia;
 import java.awt.Color;
 import java.util.List;
@@ -16,18 +16,18 @@ import entidades.Materia;
  *
  * @author John David Molina Velarde, Leticia Mores, Enrique Germán Martínez, Carlos Eduardo Beltrán
  */
-public class GestionMaterias extends javax.swing.JInternalFrame {
+public class CrudMaterias extends javax.swing.JInternalFrame {
 	DefaultTableModel modeloTabla;
 	public static List<Materia> listaMaterias;
 	private final MateriaData materiaData;	
 	private enum TipoEdicion {AGREGAR, MODIFICAR, BUSCAR};
 	private TipoEdicion tipoEdicion = TipoEdicion.AGREGAR; //para que el boton guardar sepa que estoy queriendo hacer:
 														   // Si con los campos voy a agregar, modificar o buscar un materia
-	private MateriaData.Ordenacion ordenacion = MateriaData.Ordenacion.PORIDMATERIA; // defino el tipo de orden por defecto 
+	private MateriaData.OrdenacionMateria ordenacion = MateriaData.OrdenacionMateria.PORIDMATERIA; // defino el tipo de orden por defecto 
 	private FiltroMaterias filtro = new FiltroMaterias();  //el filtro de búsqueda
 	
 	
-	public GestionMaterias() {
+	public CrudMaterias() {
 		initComponents();
 		materiaData = new MateriaData(); 
 		modeloTabla = (DefaultTableModel) tablaMaterias.getModel();
@@ -745,7 +745,7 @@ public class GestionMaterias extends javax.swing.JInternalFrame {
 
 	
 	
-	/** Cierra la ventana (termina GestionMaterias */
+	/** Cierra la ventana (termina CrudMaterias */
     private void btnSalirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSalirActionPerformed
         dispose();//cierra la ventana
     }//GEN-LAST:event_btnSalirActionPerformed
@@ -758,13 +758,13 @@ public class GestionMaterias extends javax.swing.JInternalFrame {
 	 */
     private void cboxOrdenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cboxOrdenActionPerformed
         if (cboxOrden.getSelectedIndex() == 0)
-        ordenacion = Ordenacion.PORIDMATERIA;
+        ordenacion = OrdenacionMateria.PORIDMATERIA;
         else if (cboxOrden.getSelectedIndex() == 1)
-        ordenacion = Ordenacion.PORANIO;
+        ordenacion = OrdenacionMateria.PORANIO;
         else if (cboxOrden.getSelectedIndex() == 2)
-        ordenacion = Ordenacion.PORNOMBRE;
+        ordenacion = OrdenacionMateria.PORNOMBRE;
         else // por las dudas que no eligio uno correcto
-        ordenacion = Ordenacion.PORIDMATERIA;
+        ordenacion = OrdenacionMateria.PORIDMATERIA;
 
         cargarListaMaterias();
         cargarTabla();

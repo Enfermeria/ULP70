@@ -41,7 +41,7 @@
           <SubComponents>
             <MenuItem class="javax.swing.JMenuItem" name="menuGestionInscripcionesporAlumno">
               <Properties>
-                <Property name="text" type="java.lang.String" value="Gesti&#xf3;n de inscripciones Alumnos por materia"/>
+                <Property name="text" type="java.lang.String" value="Gesti&#xf3;n de inscripciones por Alumnos"/>
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="menuGestionInscripcionesporAlumnoActionPerformed"/>
@@ -49,7 +49,7 @@
             </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="menuGestionInscripcionesporMateria">
               <Properties>
-                <Property name="text" type="java.lang.String" value="Gesti&#xf3;n de inscripciones Materias por alumno"/>
+                <Property name="text" type="java.lang.String" value="Gesti&#xf3;n de inscripciones por Materias"/>
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="menuGestionInscripcionesporMateriaActionPerformed"/>

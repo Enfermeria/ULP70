@@ -33,7 +33,7 @@ import entidades.Materia;
  */
 public class MateriaData {
 	ConexionMySQL conexion; //gestiona la conexión con la bd
-	public enum Ordenacion {PORIDMATERIA, PORANIO, PORNOMBRE}; //tipo de ordenamiento
+	public enum OrdenacionMateria {PORIDMATERIA, PORANIO, PORNOMBRE}; //tipo de ordenamiento
 	
 	public MateriaData() {
 		conexion = new ConexionMySQL();
@@ -151,7 +151,7 @@ public class MateriaData {
 	 * @return la lista de alumnos
 	 */
 	public List<Materia> getListaMaterias(){ 
-		return getListaMaterias(Ordenacion.PORIDMATERIA);
+		return getListaMaterias(OrdenacionMateria.PORIDMATERIA);
 	} // getListaMaterias
 	
 	
@@ -161,16 +161,16 @@ public class MateriaData {
 	 * @param ordenacion es el orden en el que se devolverán
 	 * @return devuelve la lista de materias
 	 */
-	public List<Materia> getListaMaterias(Ordenacion ordenacion){
+	public List<Materia> getListaMaterias(OrdenacionMateria ordenacion){
 		ArrayList<Materia> lista = new ArrayList();
 		String sql = "Select * from materia";
 		
 		//defino orden
-		if (ordenacion == Ordenacion.PORIDMATERIA) 
+		if (ordenacion == OrdenacionMateria.PORIDMATERIA) 
 			sql = sql + " Order by idmateria";
-		else if (ordenacion == Ordenacion.PORANIO)
+		else if (ordenacion == OrdenacionMateria.PORANIO)
 			sql = sql + " Order by anio";
-		else // solo queda Ordenacion.PORNOMBRE
+		else // solo queda OrdenacionMateria.PORNOMBRE
 			sql = sql + " Order by nombre";
 		
 		//ejecuto
@@ -202,7 +202,7 @@ public class MateriaData {
 	 * @param ordenacion es el orden en el que devolverá la lista
 	 * @return lista de materias que cumplen con el criterio de búsqueda
 	 */
-	public List<Materia> getListaMateriasXCriterioDeBusqueda(int idMateria, int anio, String nombre, Ordenacion ordenacion){ 
+	public List<Materia> getListaMateriasXCriterioDeBusqueda(int idMateria, int anio, String nombre, OrdenacionMateria ordenacion){ 
 		ArrayList<Materia> lista = new ArrayList();
 		String sql = "Select * from materia";
 		if ( idMateria != -1 || anio !=- 1 || ! nombre.isEmpty() ) {
@@ -225,9 +225,9 @@ public class MateriaData {
 		}
 		
 		//defino orden
-		if (ordenacion == Ordenacion.PORIDMATERIA) 
+		if (ordenacion == OrdenacionMateria.PORIDMATERIA) 
 			sql = sql + " Order by idmateria";
-		else if (ordenacion == Ordenacion.PORANIO)
+		else if (ordenacion == OrdenacionMateria.PORANIO)
 			sql = sql + " Order by anio";
 		else 
 			sql = sql + " Order by nombre";		

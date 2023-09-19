@@ -2,7 +2,7 @@
 package vistas;
 
 import accesoadatos.AlumnoData;
-import accesoadatos.AlumnoData.Ordenacion;
+import accesoadatos.AlumnoData.OrdenacionAlumno;
 import accesoadatos.InscripcionData;
 import accesoadatos.MateriaData;
 import accesoadatos.Utils;
@@ -19,7 +19,7 @@ import javax.swing.table.DefaultTableModel;
  *
  * @author John David Molina Velarde, Leticia Mores, Enrique Germán Martínez, Carlos Eduardo Beltrán
  */
-public class GestionInscripciones extends javax.swing.JInternalFrame {
+public class CrudInscripcionesXAlumno extends javax.swing.JInternalFrame {
 	DefaultTableModel modeloTablaAlumnos, modeloTablaMateriasInscriptas, modeloTablaMateriasDisponibles;
 	public static List<Alumno> listaAlumnos;
     public static List<Inscripcion> listaInscripciones; //lista de inscripciones de un alumno
@@ -28,14 +28,14 @@ public class GestionInscripciones extends javax.swing.JInternalFrame {
     private final MateriaData materiaData;
     private final InscripcionData inscripcionData;
 	// private enum TipoEdicion {AGREGAR, MODIFICAR, BUSCAR};
-	private Ordenacion ordenacion = Ordenacion.PORIDALUMNO; // defino el tipo de orden por defecto 
+	private OrdenacionAlumno ordenacion = OrdenacionAlumno.PORIDALUMNO; // defino el tipo de orden por defecto 
 	private FiltroAlumnos filtro = new FiltroAlumnos();  //el filtro de búsqueda
 	
 
 	/**
 	 * Creates new form GestionInscripciones
 	 */
-	public GestionInscripciones() {
+	public CrudInscripcionesXAlumno() {
 		initComponents();
 		alumnoData = new AlumnoData();
 		materiaData = new MateriaData();
@@ -738,13 +738,13 @@ public class GestionInscripciones extends javax.swing.JInternalFrame {
 	
     private void cboxOrdenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cboxOrdenActionPerformed
         if (cboxOrden.getSelectedIndex() == 0)
-			ordenacion = Ordenacion.PORIDALUMNO;
+			ordenacion = OrdenacionAlumno.PORIDALUMNO;
         else if (cboxOrden.getSelectedIndex() == 1)
-			ordenacion = Ordenacion.PORDNI;
+			ordenacion = OrdenacionAlumno.PORDNI;
         else if (cboxOrden.getSelectedIndex() == 2)
-			ordenacion = Ordenacion.PORAPYNO;
+			ordenacion = OrdenacionAlumno.PORAPYNO;
         else // por las dudas que no eligio uno correcto
-			ordenacion = Ordenacion.PORIDALUMNO;
+			ordenacion = OrdenacionAlumno.PORIDALUMNO;
 		
 		cargarListaAlumnos();
         cargarTablaAlumnos();

@@ -2,7 +2,7 @@
 package vistas;
 
 import accesoadatos.AlumnoData;
-import accesoadatos.AlumnoData.Ordenacion;
+import accesoadatos.AlumnoData.OrdenacionAlumno;
 import accesoadatos.Utils;
 import java.awt.Color;
 import java.time.LocalDate;
@@ -15,14 +15,14 @@ import entidades.Alumno;
  *
  * @author John David Molina Velarde, Leticia Mores, Enrique Germán Martínez, Carlos Eduardo Beltrán
  */
-public class GestionAlumnos extends javax.swing.JInternalFrame {
+public class CrudAlumnos extends javax.swing.JInternalFrame {
 	DefaultTableModel modeloTabla;
 	public static List<Alumno> listaAlumnos;
 	private final AlumnoData alumnoData;	
 	private enum TipoEdicion {AGREGAR, MODIFICAR, BUSCAR};
 	private TipoEdicion tipoEdicion = TipoEdicion.AGREGAR; //para que el boton guardar sepa que estoy queriendo hacer:
 														   // Si con los campos voy a agregar, modificar o buscar un alumno
-	private Ordenacion ordenacion = Ordenacion.PORIDALUMNO; // defino el tipo de orden por defecto 
+	private OrdenacionAlumno ordenacion = OrdenacionAlumno.PORIDALUMNO; // defino el tipo de orden por defecto 
 	private FiltroAlumnos filtro = new FiltroAlumnos();  //el filtro de búsqueda
 	
 	//DefaultTableModel modeloTabla = new DefaultTableModel() {
@@ -32,7 +32,7 @@ public class GestionAlumnos extends javax.swing.JInternalFrame {
 	//};
 
 
-	public GestionAlumnos() { //constructor
+	public CrudAlumnos() { //constructor
 		initComponents();
 		alumnoData = new AlumnoData(); 
 		modeloTabla = (DefaultTableModel) tablaAlumnos.getModel();
@@ -749,7 +749,7 @@ public class GestionAlumnos extends javax.swing.JInternalFrame {
 
 
 
-	/** Cierra la ventana (termina GestionAlumnos */
+	/** Cierra la ventana (termina CrudAlumnos */
     private void btnSalirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSalirActionPerformed
         dispose();//cierra la ventana
     }//GEN-LAST:event_btnSalirActionPerformed
@@ -882,13 +882,13 @@ public class GestionAlumnos extends javax.swing.JInternalFrame {
 	
     private void cboxOrdenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cboxOrdenActionPerformed
         if (cboxOrden.getSelectedIndex() == 0)
-			ordenacion = Ordenacion.PORIDALUMNO;
+			ordenacion = OrdenacionAlumno.PORIDALUMNO;
 		else if (cboxOrden.getSelectedIndex() == 1)
-			ordenacion = Ordenacion.PORDNI;
+			ordenacion = OrdenacionAlumno.PORDNI;
 		else if (cboxOrden.getSelectedIndex() == 2)
-			ordenacion = Ordenacion.PORAPYNO;
+			ordenacion = OrdenacionAlumno.PORAPYNO;
 		else // por las dudas que no eligio uno correcto
-			ordenacion = Ordenacion.PORIDALUMNO;
+			ordenacion = OrdenacionAlumno.PORIDALUMNO;
 		
 		cargarListaAlumnos();
 		cargarTabla();

@@ -150,8 +150,11 @@ public class InscripcionData {
 	}
 	
 	
-	
-	public List<Inscripcion> getListaInscripciones(){ // devuelve una lista con los inscripciones de la base de datos
+	/**
+	 * Devuelve la lista completa de inscripciones de la base de datos
+	 * @return la lista de inscripciones
+	 */
+	public List<Inscripcion> getListaInscripciones(){ 
 		ArrayList<Inscripcion> lista = new ArrayList();
 		String sql = "Select * from inscripcion";
 		ResultSet rs = conexion.sqlSelect(sql);
@@ -165,11 +168,15 @@ public class InscripcionData {
 			mensajeError("Error al obtener lista de inscripciones" + ex.getMessage());
 		}
 		return lista;
-	}
+	} //getListaInscripciones
 	
 	
-
-	public List<Inscripcion> getListaInscripcionesDelAlumno(int idAlumno){ // devuelve una lista con los inscripciones de ese alumno de la base de datos
+	/**
+	 * dado un idAlumno devuelve la lista de inscripciones de ese alumno de la bd
+	 * @param idAlumno
+	 * @return lista de inscripciones de ese idAlumno
+	 */
+	public List<Inscripcion> getListaInscripcionesDelAlumno(int idAlumno){ 
 		ArrayList<Inscripcion> lista = new ArrayList();
 		String sql = "Select * from inscripcion where idalumno=" + idAlumno;
 		ResultSet rs = conexion.sqlSelect(sql);
@@ -183,13 +190,18 @@ public class InscripcionData {
 			mensajeError("Error al obtener lista de inscripciones" + ex.getMessage());
 		}
 		return lista;
-	}
+	} //getListaInscripcionesDelAlumno
 	
 	
-        
-        public List<Inscripcion> getListaInscripcionesDisponibles(int idAlumno){ // devuelve una lista con los inscripciones de ese alumno de la base de datos
+	
+	/**
+	 * dado un idMateria devuelve la lista de inscripciones de esa materia de la bd
+	 * @param idMateria
+	 * @return lista de inscripciones de esa idMateria
+	 */
+	public List<Inscripcion> getListaInscripcionesDeLaMateria(int idMateria){ 
 		ArrayList<Inscripcion> lista = new ArrayList();
-		String sql = "Select * from inscripcion where idalumno<>" + idAlumno;
+		String sql = "Select * from inscripcion where idmateria=" + idMateria;
 		ResultSet rs = conexion.sqlSelect(sql);
 		try {
 			while (rs.next()) {
@@ -201,10 +213,16 @@ public class InscripcionData {
 			mensajeError("Error al obtener lista de inscripciones" + ex.getMessage());
 		}
 		return lista;
-	}
-
-
+	} //getListaInscripcionesDeLaMateria
 	
+	
+
+
+	/**
+	 * dado un idmateria, devuelve la lista de alumnos que cursan esa materia
+	 * @param idmateria
+	 * @return lista de alumnos que cursan esa idmateria
+	 */
 	public List<Alumno> getListaAlumnosXMateria(int idmateria) { // dada un idMateria, devuelve la lista de alumnos que cursan dicha materia
 		AlumnoData alumnoData = new AlumnoData();
 		ArrayList<Alumno> listaAlumnos = new ArrayList();
@@ -222,11 +240,15 @@ public class InscripcionData {
 		}
 
 		return listaAlumnos;
-	}
+	} //getListaAlumnosXMateria
 	
 	
-	
-	public List<Materia> getListaMateriasXAlumno(int idalumno) { // dada un idAlumno, devuelve la lista de materias que cursa
+	/**
+	 * dao un idAlumno, devuelve la lista de materias que cursa
+	 * @param idalumno
+	 * @return Lista de materias que cursa el idalumno
+	 */
+	public List<Materia> getListaMateriasXAlumno(int idalumno) {
 		MateriaData materiaData = new MateriaData();
 		ArrayList<Materia> listaMaterias = new ArrayList();
 		String sql = "Select m.idmateria, m.nombre, m.anio, m.estado from inscripcion i, materia m " +
@@ -243,7 +265,7 @@ public class InscripcionData {
 		}
 
 		return listaMaterias;
-	}
+	} // getListaMateriasXAlumno
 	
 	
 	/**
