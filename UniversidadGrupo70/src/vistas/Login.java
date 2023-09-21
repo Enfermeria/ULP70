@@ -4,6 +4,10 @@
  */
 package vistas;
 
+import accesoadatos.AlumnoData;
+import entidades.Alumno;
+import java.awt.Image;
+import java.awt.Toolkit;
 import javax.swing.JOptionPane;
 
 /**
@@ -19,6 +23,21 @@ public class Login extends javax.swing.JFrame {
         initComponents();
     }
 
+	
+	
+	/**
+	 * Para poder poner el ícono de la ULP en la ventana
+	 * @return 
+	 */	
+	@Override
+	public Image getIconImage() { // defino el icono del jFrame
+		Image retValue = Toolkit.getDefaultToolkit().
+				getImage(ClassLoader.getSystemResource("imagenes/ulp_32x32.png")); //icono de la ULP
+		return retValue;
+	}
+	
+	
+	
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -41,6 +60,7 @@ public class Login extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setBackground(new java.awt.Color(0, 102, 102));
+        setIconImage(getIconImage());
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         jLNombre.setFont(new java.awt.Font("Sitka Text", 0, 16)); // NOI18N
@@ -102,7 +122,9 @@ public class Login extends javax.swing.JFrame {
 
     private void jBLoginActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBLoginActionPerformed
         try {
-                 
+            
+			AlumnoData alumnoData = new AlumnoData();
+			
             String apellido = jTApellido.getText();
             String nombre = jTNombre.getText();
             int dni = Integer.parseInt(new String(jPassword.getPassword()));
@@ -115,14 +137,17 @@ public class Login extends javax.swing.JFrame {
 				dispose(); //cierra ventana de login
                 
             }else {
-                
-//                System.out.println("Acceso de alumnos");
-                AutogestionAlumnos autogestionAlumnos = new AutogestionAlumnos(alumno);
-                        autogestionAlumnos.setVisible(true);
-                        autogestionAlumnos.setLocationRelativeTo(null); // abrirlo en el centro
-				dispose(); //cierra ventana de login
+                Alumno alumno = alumnoData.getAlumno(apellido, nombre, dni);
+				if (alumno != null) { // si no es null es que encontró el alumno
+	                //System.out.println("Acceso de alumnos");
+					AutogestionAlumnos autogestionAlumnos = new AutogestionAlumnos(alumno);
+					autogestionAlumnos.setVisible(true);
+					autogestionAlumnos.setLocationRelativeTo(null); // abrirlo en el centro
+					dispose(); //cierra ventana de login
+				} else
+					JOptionPane.showMessageDialog(null, "Nombre, apellido o clave no corresponden a un usuario válido", "Usuario no existe", JOptionPane.ERROR_MESSAGE);
             }
-//            System.out.println(" " + apellido + " " + nombre + " " + dni);
+//          System.out.println(" " + apellido + " " + nombre + " " + dni);
         } catch (NumberFormatException e) {
             JOptionPane.showMessageDialog(null, "La clave debe ser numerica, verifique los datos ingresados", "Numero no valido", JOptionPane.ERROR_MESSAGE);
         }

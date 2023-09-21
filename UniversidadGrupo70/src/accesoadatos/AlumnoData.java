@@ -317,4 +317,29 @@ public class AlumnoData {
 		return alumno;
 	} //getAlumno
 	
+	
+	/**
+	 * Devuelve el alumno con ese apellido y nombre y con ese dni
+	 * @param id es el idalumno para identificarlo
+	 * @return  el alumno retornado. Si no lo encuentra devuelve null.
+	 */
+	public Alumno getAlumno(String apellido, String nombre, int dni){
+		String sql = "Select * from alumno where nombre='" + nombre + "' " +
+				"and apellido='" + apellido + "' " +
+				"and dni='" + dni + "'";
+		ResultSet rs = conexion.sqlSelect(sql);
+		Alumno alumno = null;
+		try {
+			if (rs.next()) {
+				alumno = resultSet2Alumno(rs);
+				conexion.cerrarSentencia();
+			} else
+				mensajeError("Error al obtener un alumno");
+		} catch (SQLException ex) {
+			//Logger.getLogger(AlumnoData.class.getName()).log(Level.SEVERE, null, ex);
+			mensajeError("Error al obtener un Alumno " + ex.getMessage());
+		}
+		return alumno;
+	} //getAlumno
+	
 } //class AlumnoData

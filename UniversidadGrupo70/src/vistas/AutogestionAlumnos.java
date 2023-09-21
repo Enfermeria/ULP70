@@ -2,25 +2,14 @@
 package vistas;
 
 import accesoadatos.AlumnoData;
-import accesoadatos.AlumnoData.OrdenacionAlumno;
-import accesoadatos.ConexionMySQL;
-import static accesoadatos.ConexionMySQL.conexion;
 import accesoadatos.InscripcionData;
 import accesoadatos.MateriaData;
-import accesoadatos.Utils;
-import static accesoadatos.Utils.mensajeError;
 import entidades.Alumno;
 import entidades.Inscripcion;
 import entidades.Materia;
-import java.awt.Color;
 import java.awt.Image;
 import java.awt.Toolkit;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.time.LocalDate;
-import java.util.Date;
 import java.util.List;
-import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
 
@@ -42,26 +31,23 @@ public class AutogestionAlumnos extends javax.swing.JFrame {
     public AutogestionAlumnos(Alumno alumno) {
 	initComponents();
         this.alumno= alumno;
-	alumnoData = new AlumnoData();
-	materiaData = new MateriaData();
+		alumnoData = new AlumnoData();
+		materiaData = new MateriaData();
         inscripcionData = new InscripcionData();
         modeloTablaMateriasInscriptas = (DefaultTableModel) tablaMateriasInscriptas.getModel();
         modeloTablaMateriasDisponibles = (DefaultTableModel) tablaMateriasDisponibles.getModel();
-        
-                   
-        
 	
-	txtId.setText("" + alumno.getIdalumno());
-	txtDni.setText("" + alumno.getDni());
-	txtApellido.setText(alumno.getApellido());
-	txtNombre.setText(alumno.getNombre());
-	//jdcFechaNacimiento.setDate(new Date(76, 8, 15)); 
-	//checkboxEstado.setSelected(true);
-	
-		
-		
-	cargarListaMaterias(txtIdAlumno2IdAlumno());
-	cargarTablaMaterias();
+		//cargo los campos con el alumno que me pasaron
+		txtId.setText("" + alumno.getIdalumno());
+		txtDni.setText("" + alumno.getDni());
+		txtApellido.setText(alumno.getApellido());
+		txtNombre.setText(alumno.getNombre());
+		//jdcFechaNacimiento.setDate(new Date(76, 8, 15)); 
+		//checkboxEstado.setSelected(true);
+
+		//cargo las materias inscriptas y disponibles de ese alumno
+		cargarListaMaterias(alumno.getIdalumno());
+		cargarTablaMaterias();
 	} // constructor
 
 	
@@ -234,6 +220,7 @@ public class AutogestionAlumnos extends javax.swing.JFrame {
         btnSalir = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setIconImage(getIconImage());
 
         panelTablaMateriasInscriptas.setBackground(new java.awt.Color(153, 153, 255));
 
@@ -269,7 +256,7 @@ public class AutogestionAlumnos extends javax.swing.JFrame {
         jScrollPane2.setViewportView(tablaMateriasInscriptas);
 
         lblTituloTabla1.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
-        lblTituloTabla1.setText("Materias que curso");
+        lblTituloTabla1.setText("Materias que cursa");
         lblTituloTabla1.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
 
         javax.swing.GroupLayout panelTablaMateriasInscriptasLayout = new javax.swing.GroupLayout(panelTablaMateriasInscriptas);
@@ -523,11 +510,10 @@ public class AutogestionAlumnos extends javax.swing.JFrame {
         if (numfilaDisp != -1) { //si hay alguna fila seleccionada en la tabla de materias disponibles
             int idMateria = filaTablaDisponibles2IdMateria(numfilaDisp);//averiguamos el idMateria
 
-            int idAlumno = txtIdAlumno2IdAlumno(); //averiguamos el idAlumno
-            inscripcionData.altaInscripcion(0.0, idAlumno, idMateria); // Lo inscribimos
+            inscripcionData.altaInscripcion(0.0, alumno.getIdalumno(), idMateria); // Lo inscribimos
 
             //actualizamos las listas y tablas de materias
-            cargarListaMaterias(idAlumno);
+            cargarListaMaterias(alumno.getIdalumno());
             cargarTablaMaterias();
         }
     }//GEN-LAST:event_btnInscribirseActionPerformed
@@ -537,20 +523,19 @@ public class AutogestionAlumnos extends javax.swing.JFrame {
             btnDesinscribirse.setEnabled(false); // deshabilito botón Desinscribirse.
         }
         int numfilaInsc = tablaMateriasInscriptas.getSelectedRow();
-        if (numfilaInsc != -1) { //si hay alguna fila seleccionada en la tabla de materias disponibles
-            int idInscripcion = filaTablaInscriptas2IdInscripcion(numfilaInsc);//averiguamos el idMateria
+        if (numfilaInsc != -1) { //si hay alguna fila seleccionada en la tabla de materias inscriptas
+            int idInscripcion = filaTablaInscriptas2IdInscripcion(numfilaInsc);//averiguamos el idInscripcion
 
-            int idAlumno = txtIdAlumno2IdAlumno(); //averiguamos el idAlumno
-            inscripcionData.bajaInscripcion(idInscripcion); // Lo inscribimos
+            inscripcionData.bajaInscripcion(idInscripcion); // Lo desinscribimos
 
             //actualizamos las listas y tablas de materias
-            cargarListaMaterias(idAlumno);
+            cargarListaMaterias(alumno.getIdalumno());
             cargarTablaMaterias();
         }
     }//GEN-LAST:event_btnDesinscribirseActionPerformed
 
     private void btnSalirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSalirActionPerformed
-        // TODO add your handling code here:
+        dispose(); // cierra la ventana
     }//GEN-LAST:event_btnSalirActionPerformed
 
 	/**
