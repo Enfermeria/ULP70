@@ -86,7 +86,8 @@ public class ConexionMySQL { //
 			System.out.println("Error al cargar el Driver JDBC: " + ex.getMessage());
 			return false;
 		} catch (SQLException ex) {
-			JOptionPane.showMessageDialog(null, "Error de conexión sql: " + ex.getMessage());
+			// JOptionPane.showMessageDialog(null, "Error de conexión sql: " + ex.getMessage());
+			System.out.println("Error de conexión sql: " + ex.getMessage());
 			return false;
 		}
 	} //conectar MySQL
