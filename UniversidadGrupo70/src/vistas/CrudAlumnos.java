@@ -460,6 +460,11 @@ public class CrudAlumnos extends javax.swing.JInternalFrame {
         checkboxEstado.setBorderPainted(true);
         checkboxEstado.setEnabled(false);
         checkboxEstado.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        checkboxEstado.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                checkboxEstadoActionPerformed(evt);
+            }
+        });
 
         btnGuardar.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         btnGuardar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/guardar2_32x32.png"))); // NOI18N
@@ -900,6 +905,10 @@ public class CrudAlumnos extends javax.swing.JInternalFrame {
     private void cboxOrdenPropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_cboxOrdenPropertyChange
         System.out.println("Cambio property de cboxOrden");
     }//GEN-LAST:event_cboxOrdenPropertyChange
+
+    private void checkboxEstadoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_checkboxEstadoActionPerformed
+            // TODO add your handling code here:
+    }//GEN-LAST:event_checkboxEstadoActionPerformed
 
 	
 

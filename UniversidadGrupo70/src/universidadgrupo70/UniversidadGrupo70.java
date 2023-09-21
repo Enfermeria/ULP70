@@ -13,6 +13,7 @@ package universidadgrupo70;
 
 import vistas.Login;
 import vistas.PantallaPpal;
+import vistas.AutogestionAlumnos;
 
 /**
  *

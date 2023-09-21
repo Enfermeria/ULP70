@@ -3,15 +3,20 @@ package vistas;
 
 import accesoadatos.AlumnoData;
 import accesoadatos.AlumnoData.OrdenacionAlumno;
+import accesoadatos.ConexionMySQL;
+import static accesoadatos.ConexionMySQL.conexion;
 import accesoadatos.InscripcionData;
 import accesoadatos.MateriaData;
 import accesoadatos.Utils;
+import static accesoadatos.Utils.mensajeError;
 import entidades.Alumno;
 import entidades.Inscripcion;
 import entidades.Materia;
 import java.awt.Color;
 import java.awt.Image;
 import java.awt.Toolkit;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
@@ -24,35 +29,39 @@ import javax.swing.table.DefaultTableModel;
  * @author John David Molina Velarde, Leticia Mores, Enrique Germán Martínez, Carlos Eduardo Beltrán
  */
 public class AutogestionAlumnos extends javax.swing.JFrame {
-	DefaultTableModel modeloTablaMateriasInscriptas, modeloTablaMateriasDisponibles;
+    DefaultTableModel modeloTablaMateriasInscriptas, modeloTablaMateriasDisponibles;
     public static List<Inscripcion> listaInscripciones; //lista de inscripciones de un alumno
     public static List<Materia> listaMateriasDisponibles;//lista de materias en las que NO está inscripto un alumno
-	private final AlumnoData alumnoData;	
+    private final AlumnoData alumnoData;	
     private final MateriaData materiaData;
     private final InscripcionData inscripcionData;
 	// private enum TipoEdicion {AGREGAR, MODIFICAR, BUSCAR};
 	
-	public AutogestionAlumnos() {
-		initComponents();
-		alumnoData = new AlumnoData();
-		materiaData = new MateriaData();
+    private Alumno alumno;   
+   
+    public AutogestionAlumnos(Alumno alumno) {
+	initComponents();
+        this.alumno= alumno;
+	alumnoData = new AlumnoData();
+	materiaData = new MateriaData();
         inscripcionData = new InscripcionData();
         modeloTablaMateriasInscriptas = (DefaultTableModel) tablaMateriasInscriptas.getModel();
         modeloTablaMateriasDisponibles = (DefaultTableModel) tablaMateriasDisponibles.getModel();
         
+                   
+        
+	
+	txtId.setText("" + alumno.getIdalumno());
+	txtDni.setText("" + alumno.getDni());
+	txtApellido.setText(alumno.getApellido());
+	txtNombre.setText(alumno.getNombre());
+	//jdcFechaNacimiento.setDate(new Date(76, 8, 15)); 
+	//checkboxEstado.setSelected(true);
+	
 		
-		// SOLO PARA PROBAR... BORRAR DESPUES!!!!
-		txtId.setText("1");
-		txtDni.setText("12564278");
-		txtApellido.setText("Rivas");
-		txtNombre.setText("Jorge Alberto");
-		//jdcFechaNacimiento.setDate(new Date(76, 8, 15)); 
-		//checkboxEstado.setSelected(true);
-		// FIN SOLO PARA PROBAR
 		
-		
-		cargarListaMaterias(txtIdAlumno2IdAlumno());
-		cargarTablaMaterias();
+	cargarListaMaterias(txtIdAlumno2IdAlumno());
+	cargarTablaMaterias();
 	} // constructor
 
 	
@@ -282,7 +291,7 @@ public class AutogestionAlumnos extends javax.swing.JFrame {
                 .addGap(3, 3, 3)
                 .addComponent(lblTituloTabla1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 122, Short.MAX_VALUE)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -342,7 +351,7 @@ public class AutogestionAlumnos extends javax.swing.JFrame {
                 .addGap(3, 3, 3)
                 .addComponent(lblTituloTabla2)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 205, Short.MAX_VALUE)
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 201, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -416,7 +425,7 @@ public class AutogestionAlumnos extends javax.swing.JFrame {
         panelDatosLayout.setVerticalGroup(
             panelDatosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(panelDatosLayout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap(43, Short.MAX_VALUE)
                 .addComponent(jLabel1)
                 .addGap(18, 18, 18)
                 .addComponent(lblFoto)
@@ -450,12 +459,13 @@ public class AutogestionAlumnos extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(30, 30, 30)
+                        .addGap(25, 25, 25)
                         .addComponent(btnInscribirse)
-                        .addGap(36, 36, 36)
+                        .addGap(52, 52, 52)
                         .addComponent(btnDesinscribirse)
-                        .addGap(55, 55, 55)
-                        .addComponent(btnSalir))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(btnSalir)
+                        .addGap(36, 36, 36))
                     .addComponent(panelTablaMateriasInscriptas, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(panelTablaMateriasDisponibles, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
@@ -464,17 +474,17 @@ public class AutogestionAlumnos extends javax.swing.JFrame {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(panelDatos, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(panelTablaMateriasInscriptas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(panelTablaMateriasInscriptas, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(btnInscribirse)
                             .addComponent(btnDesinscribirse)
                             .addComponent(btnSalir))
-                        .addGap(20, 20, 20)
-                        .addComponent(panelTablaMateriasDisponibles, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(panelDatos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(panelTablaMateriasDisponibles, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap())
         );
 
         pack();
@@ -571,11 +581,11 @@ public class AutogestionAlumnos extends javax.swing.JFrame {
 		//</editor-fold>
 
 		/* Create and display the form */
-		java.awt.EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				new AutogestionAlumnos().setVisible(true);
-			}
-		});
+//		java.awt.EventQueue.invokeLater(new Runnable() {
+//			public void run() {
+//				new AutogestionAlumnos().setVisible(true);
+//			}
+//		});
 	}
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

@@ -115,9 +115,14 @@ public class Login extends javax.swing.JFrame {
 				dispose(); //cierra ventana de login
                 
             }else {
-                System.out.println("Acceso de alumnos");
+                
+//                System.out.println("Acceso de alumnos");
+                AutogestionAlumnos autogestionAlumnos = new AutogestionAlumnos(alumno);
+                        autogestionAlumnos.setVisible(true);
+                        autogestionAlumnos.setLocationRelativeTo(null); // abrirlo en el centro
+				dispose(); //cierra ventana de login
             }
-           // System.out.println(" " + apellido + " " + nombre + " " + dni);
+//            System.out.println(" " + apellido + " " + nombre + " " + dni);
         } catch (NumberFormatException e) {
             JOptionPane.showMessageDialog(null, "La clave debe ser numerica, verifique los datos ingresados", "Numero no valido", JOptionPane.ERROR_MESSAGE);
         }
