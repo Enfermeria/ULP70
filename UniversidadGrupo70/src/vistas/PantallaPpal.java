@@ -152,7 +152,7 @@ public class PantallaPpal extends javax.swing.JFrame {
     }//GEN-LAST:event_menuSalirSistemaActionPerformed
 
     private void menuGestionMateriasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuGestionMateriasActionPerformed
-        	escritorio.removeAll(); // cierro todas las ventanas del escritorio
+        escritorio.removeAll(); // cierro todas las ventanas del escritorio
 		escritorio.repaint();
 		
 		CrudMaterias gm = new CrudMaterias(); // creo un internal Frame
