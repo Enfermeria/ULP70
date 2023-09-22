@@ -46,10 +46,11 @@ public class PantallaPpal extends javax.swing.JFrame {
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Sistema de gestión ULP");
         setIconImage(getIconImage());
+        setResizable(false);
 
         escritorio.setPreferredSize(new java.awt.Dimension(900, 610));
 
-        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/ULP Foto campus universiatrio 3 - 1200x523.jpg"))); // NOI18N
+        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/ULP Foto campus universiatrio con borde y logo- 1200x597.jpg"))); // NOI18N
         jLabel1.setText("jLabel1");
         jLabel1.setPreferredSize(new java.awt.Dimension(1220, 523));
 
