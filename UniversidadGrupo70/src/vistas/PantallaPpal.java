@@ -141,8 +141,27 @@ public class PantallaPpal extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+	
+	
+	private void mostrarFondo(){
+		escritorio.setLayer(jLabel1, javax.swing.JLayeredPane.DEFAULT_LAYER);
+		javax.swing.GroupLayout escritorioLayout = new javax.swing.GroupLayout(escritorio);
+        escritorio.setLayout(escritorioLayout);
+        escritorioLayout.setHorizontalGroup(
+            escritorioLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, 1238, Short.MAX_VALUE)
+        );
+        escritorioLayout.setVerticalGroup(
+            escritorioLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, 600, Short.MAX_VALUE)
+        );
+	}
+	
+	
+	
     private void menuGestionAlumnosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuGestionAlumnosActionPerformed
         escritorio.removeAll(); // cierro todas las ventanas del escritorio
+		mostrarFondo();
 		escritorio.repaint();
 		
 		CrudAlumnos ga = new CrudAlumnos(); // creo un internal Frame
@@ -159,6 +178,7 @@ public class PantallaPpal extends javax.swing.JFrame {
 
     private void menuGestionMateriasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuGestionMateriasActionPerformed
         escritorio.removeAll(); // cierro todas las ventanas del escritorio
+		mostrarFondo();
 		escritorio.repaint();
 		
 		CrudMaterias gm = new CrudMaterias(); // creo un internal Frame
@@ -170,6 +190,7 @@ public class PantallaPpal extends javax.swing.JFrame {
 
     private void menuGestionInscripcionesporAlumnoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuGestionInscripcionesporAlumnoActionPerformed
         escritorio.removeAll(); // cierro todas las ventanas del escritorio
+		mostrarFondo();
 		escritorio.repaint();
 		
 		CrudInscripcionesXAlumno gi = new CrudInscripcionesXAlumno(); // creo un internal Frame
@@ -181,6 +202,7 @@ public class PantallaPpal extends javax.swing.JFrame {
 
     private void menuGestionInscripcionesporMateriaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuGestionInscripcionesporMateriaActionPerformed
         escritorio.removeAll(); // cierro todas las ventanas del escritorio
+		mostrarFondo();
 		escritorio.repaint();
 		
 		CrudInscripcionesXMateria gi = new CrudInscripcionesXMateria(); // creo un internal Frame
