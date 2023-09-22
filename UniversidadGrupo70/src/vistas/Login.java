@@ -5,7 +5,9 @@
 package vistas;
 
 import accesoadatos.AlumnoData;
+import accesoadatos.UsuarioData;
 import entidades.Alumno;
+import entidades.Usuario;
 import java.awt.Image;
 import java.awt.Toolkit;
 import javax.swing.JOptionPane;
@@ -123,31 +125,30 @@ public class Login extends javax.swing.JFrame {
     private void jBLoginActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBLoginActionPerformed
         try {
             
+			UsuarioData usuarioData = new UsuarioData();
 			AlumnoData alumnoData = new AlumnoData();
 			
             String apellido = jTApellido.getText();
             String nombre = jTNombre.getText();
             int dni = Integer.parseInt(new String(jPassword.getPassword()));
-            
-            if (apellido.equalsIgnoreCase("ULP")&& nombre.equalsIgnoreCase("admin")&& dni == 12345) {
-               // System.out.println("Acceso a Gestion de Alumnos");
+			Usuario usuario = usuarioData.getUsuario(apellido, nombre, dni); // intento traer ese usuario
+			Alumno alumno = alumnoData.getAlumno(apellido, nombre, dni); // intento traer ese alumno
+			
+
+			
+            if ((apellido.equalsIgnoreCase("ULP")&& nombre.equalsIgnoreCase("admin")&& dni == 12345) || 
+				(usuario != null)){ //accedo a PantallaPpal con clave maestra
                 PantallaPpal pantallaPpal = new PantallaPpal(); //creo una pantallaPpal
 				pantallaPpal.setVisible(true); // lo hago visible
 				pantallaPpal.setLocationRelativeTo(null); // abrirlo en el centro
 				dispose(); //cierra ventana de login
-                
-            }else {
-                Alumno alumno = alumnoData.getAlumno(apellido, nombre, dni);
-				if (alumno != null) { // si no es null es que encontró el alumno
-	                //System.out.println("Acceso de alumnos");
+            }else if (alumno != null) { // si no es null es que encontró el alumno. Abre autogestión de alumnos
 					AutogestionAlumnos autogestionAlumnos = new AutogestionAlumnos(alumno);
 					autogestionAlumnos.setVisible(true);
 					autogestionAlumnos.setLocationRelativeTo(null); // abrirlo en el centro
 					dispose(); //cierra ventana de login
-				} else
-					JOptionPane.showMessageDialog(null, "Nombre, apellido o clave no corresponden a un usuario válido", "Usuario no existe", JOptionPane.ERROR_MESSAGE);
-            }
-//          System.out.println(" " + apellido + " " + nombre + " " + dni);
+			} else
+				JOptionPane.showMessageDialog(null, "Nombre, apellido o clave no corresponden a un usuario válido", "Usuario no existe", JOptionPane.ERROR_MESSAGE);
         } catch (NumberFormatException e) {
             JOptionPane.showMessageDialog(null, "La clave debe ser numerica, verifique los datos ingresados", "Numero no valido", JOptionPane.ERROR_MESSAGE);
         }
