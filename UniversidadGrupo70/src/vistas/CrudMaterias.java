@@ -599,15 +599,15 @@ public class CrudMaterias extends javax.swing.JInternalFrame {
         jLabel1.setText("Gestión de Materias");
 
         txtId.setEditable(false);
-        txtId.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+        txtId.setFont(new java.awt.Font("Tahoma", 0, 13)); // NOI18N
         txtId.setBorder(javax.swing.BorderFactory.createTitledBorder("Id"));
 
         txtAnio.setEditable(false);
-        txtAnio.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+        txtAnio.setFont(new java.awt.Font("Tahoma", 0, 13)); // NOI18N
         txtAnio.setBorder(javax.swing.BorderFactory.createTitledBorder("Año"));
 
         txtNombre.setEditable(false);
-        txtNombre.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+        txtNombre.setFont(new java.awt.Font("Tahoma", 0, 13)); // NOI18N
         txtNombre.setBorder(javax.swing.BorderFactory.createTitledBorder("Nombre"));
 
         checkboxEstado.setBackground(new java.awt.Color(255, 255, 255));
