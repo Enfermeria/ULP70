@@ -285,7 +285,15 @@ public class PantallaPpal extends javax.swing.JFrame {
 	 * @param evt 
 	 */
     private void menuAcercaDeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuAcercaDeActionPerformed
-        // TODO add your handling code here:
+        escritorio.removeAll(); // cierro todas las ventanas del escritorio
+	mostrarFondo(); //recarga el fondo con la foto de la ULP
+	escritorio.repaint();
+		
+	AcercaDe ac = new AcercaDe(); // creo un internal Frame
+	ac.setVisible(true); // lo pongo visible
+		
+	escritorio.add(ac); // lo pongo en el escritorio
+	escritorio.moveToFront(ac); //pongo la ventana al frente:
     }//GEN-LAST:event_menuAcercaDeActionPerformed
 
 	
