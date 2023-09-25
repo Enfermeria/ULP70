@@ -7,6 +7,8 @@
 		Leticia Mores
 		Enrique Germán Martínez
 		Carlos Eduardo Beltrán
+		
+	Controlador de inscripciones. Permite almacenar y recuperar inscripciones de la bd.
  */
 package accesoadatos;
 
@@ -26,13 +28,28 @@ import entidades.Materia;
  * @author John David Molina Velarde, Leticia Mores, Enrique Germán Martínez, Carlos Eduardo Beltrán
  */
 public class InscripcionData {
-	ConexionMySQL conexion;
+	ConexionMySQL conexion; //gestiona la conexión con la bd
+	
+	
+	/**
+	 * Constructor. Gestiona la conexión con la bd.
+	 */
 	public InscripcionData() {
 		conexion = new ConexionMySQL();
 		conexion.conectar(); //esto es opcional. Podría ponerse en el main.
-	}
+	} //constructor
 	
-	public boolean altaInscripcion(Inscripcion inscripcion){// agrega la inscripcion a la BD. inscripcion viene sin idinscripcion. Devuelve true si pudo
+	
+	
+	
+	/**
+	 * Agrega la inscripción que se le pasa como parámetro a la bd. Devuelve
+	 * true si pudo hacer el alta.
+	 * @param inscripcion Es la inscripción a agregar. Estoy presuponiendo 
+	 *					  que viene sin idInscripcion, porque se autogenera.
+	 * @return true si pudo darlo de alta
+	 */
+	public boolean altaInscripcion(Inscripcion inscripcion){
 		//Estoy presuponiendo que al alumno y materia que trae la inscripcion YA ESTAN EN LA BD.
 		// una alternativa es usar ?,?,? y luego insertarlo con preparedStatement.setInt(1, dato) // o setString, setBoolean, setData
 		String sql = "Insert into inscripcion (idinscripcion, nota, idalumno, idmateria) " +
@@ -49,10 +66,18 @@ public class InscripcionData {
 			mensajeError("Falló el alta de inscripcion");
 			return false;
 		}
-	}
+	} //AltaInscripcion
 	
 	
-	public boolean altaInscripcion(double nota, int idAlumno, int idMateria){// agrega la inscripcion a la BD. inscripcion viene sin idinscripcion. Devuelve true si pudo
+	
+	/**
+	 * Agrega la inscipción a la BD. Devuelve true si pudo agregarlo.
+	 * @param nota     la nota de la materia
+	 * @param idAlumno
+	 * @param idMateria
+	 * @return true si pudo agregarlo
+	 */
+	public boolean altaInscripcion(double nota, int idAlumno, int idMateria){
 		//Estoy presuponiendo que al alumno y materia que trae la inscripcion YA ESTAN EN LA BD.
 		// una alternativa es usar ?,?,? y luego insertarlo con preparedStatement.setInt(1, dato) // o setString, setBoolean, setData
 		String sql = "Insert into inscripcion (idinscripcion, nota, idalumno, idmateria) " +
@@ -69,20 +94,32 @@ public class InscripcionData {
 			mensajeError("Falló el alta de inscripcion");
 			return false;
 		}
-	}
+	} //altaInscripcion
 	
 	
 	
 	
 	
-	//da de baja al inscripcion de la BD. inscripcion viene con idinscripcion
-	public boolean bajaInscripcion(Inscripcion inscripcion){// devuelve true si pudo
+	
+	
+	/**
+	 * da de baja al inscripcion de la BD. inscripcion viene con idinscripcion
+	 * @param inscripcion
+	 * @return true si pudo borrarlo
+	 */
+	public boolean bajaInscripcion(Inscripcion inscripcion){
 		return bajaInscripcion(inscripcion.getIdinscripcion()); // llama a la baja usando el idinscripcion
-	}
+	} //bajaInscripcion
 	
 	
 	
-	public boolean bajaInscripcion(int idInscripcion){// da de baja al inscripcion de la BD en base al id. Devuelve true si pudo
+	
+	/**
+	 * da de baja al inscripcion de la BD en base al idInscripcion.
+	 * @param idInscripcion
+	 * @return true si pudo borrarlo
+	 */
+	public boolean bajaInscripcion(int idInscripcion){
 		String sql = "Delete from inscripcion where idinscripcion=" + idInscripcion;
 		if (conexion.sqlUpdate(sql)){
 			mensaje("Baja de inscripcion exitosa");
@@ -93,10 +130,17 @@ public class InscripcionData {
 			mensajeError("Falló la baja de la inscripcion");
 			return false;
 		}
-	}
+	} //bajaInscripcion
 	
 	
-	public boolean bajaInscripcion(int idAlumno, int idMateria){// da de baja al inscripcion de la BD en base al idAlumno y id Materia Devuelve true si pudo
+	
+	/**
+	 * da de baja al inscripcion de la BD en base al idAlumno y id Materia 
+	 * @param idAlumno
+	 * @param idMateria
+	 * @return Devuelve true si pudo
+	 */
+	public boolean bajaInscripcion(int idAlumno, int idMateria){
 		String sql = "Delete from inscripcion where idAlumno=" + idAlumno + " and idMateria=" + idMateria;
 		if (conexion.sqlUpdate(sql)){
 			mensaje("Baja de inscripcion exitosa");
@@ -107,11 +151,18 @@ public class InscripcionData {
 			mensajeError("Falló la baja de la inscripcion");
 			return false;
 		}
-	}
+	} //bajaInscripcion
 	
 	
 	
-	// modifica al inscripcion en la BD. inscripcion viene con idinscripcion. 
+	
+	// 
+	/**
+	 * modifica al inscripcion en la BD. Usa idinscripcion para ubicar el
+	 * registro en la bd.
+	 * @param inscripcion
+	 * @return 
+	 */
 	public boolean modificarInscripcion(Inscripcion inscripcion){//Devuelve true si pudo
 		//Estoy presuponiendo que el alumno y materia que viene en la inscripcion YA ESTAN EN LA BD
 		String sql = 
@@ -129,10 +180,16 @@ public class InscripcionData {
 			mensajeError("Falló la modificación de inscripcion");
 			return false;
 		}
-	}
+	} //modificarInscripcion
 	
 	
 	
+	
+	/**
+	 * Dado un resultSet lo convierte en una Inscripcion (el primero del resultSet)
+	 * @param rs es el ResultSet que se pasa para convertirlo en el objeto Inscripcion
+	 * @return la inscripcion con los datos del resultSet
+	 */
 	public Inscripcion resultSet2Inscripcion(ResultSet rs){
 		Inscripcion inscripcion = new Inscripcion();
 		AlumnoData alumnoData = new AlumnoData();
@@ -148,6 +205,8 @@ public class InscripcionData {
 		}
 		return inscripcion;
 	}
+	
+	
 	
 	
 	/**
@@ -171,6 +230,9 @@ public class InscripcionData {
 	} //getListaInscripciones
 	
 	
+	
+	
+	
 	/**
 	 * dado un idAlumno devuelve la lista de inscripciones de ese alumno de la bd
 	 * @param idAlumno
@@ -191,6 +253,8 @@ public class InscripcionData {
 		}
 		return lista;
 	} //getListaInscripcionesDelAlumno
+	
+	
 	
 	
 	
@@ -217,6 +281,7 @@ public class InscripcionData {
 	
 	
 
+	
 
 	/**
 	 * dado un idmateria, devuelve la lista de alumnos que cursan esa materia
@@ -243,6 +308,9 @@ public class InscripcionData {
 	} //getListaAlumnosXMateria
 	
 	
+	
+	
+	
 	/**
 	 * dao un idAlumno, devuelve la lista de materias que cursa
 	 * @param idalumno
@@ -266,6 +334,9 @@ public class InscripcionData {
 
 		return listaMaterias;
 	} // getListaMateriasXAlumno
+	
+	
+	
 	
 	
 	/**
@@ -302,6 +373,8 @@ public class InscripcionData {
 	
 	
 	
+	
+	
 	/**
 	 * // dado un idMateria, devuelve la lista de alumnos disponibles para 
 	 * inscribirse 
@@ -332,7 +405,11 @@ public class InscripcionData {
 	
 	
 	
-	
+	/**
+	 * dado un idInscripcion devuelve la inscripcion de la bd
+	 * @param id el idinscripcion a buscar
+	 * @return la Inscripcion. Si no lo encuentra devuelve null.
+	 */
 	public Inscripcion getInscripcion(int id){
 		String sql = "Select * from inscripcion where idinscripcion=" + id;
 		ResultSet rs = conexion.sqlSelect(sql);
@@ -348,7 +425,7 @@ public class InscripcionData {
 			mensajeError("Error al obtener un Inscripcion " + ex.getMessage());
 		}
 		return inscripcion;
-	}
+	} //getInscripcion
 
 }
 

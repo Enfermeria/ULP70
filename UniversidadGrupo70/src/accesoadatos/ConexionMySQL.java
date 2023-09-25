@@ -7,6 +7,18 @@
 		Leticia Mores
 		Enrique Germán Martínez
 		Carlos Eduardo Beltrán
+
+	Gestiona la conexión con la bd a través de una única conexión. Por más
+	que sea llamado en varias ocasiones, solo genera una única conexión
+	para no desperdiciar recursos (no es Singleton, pero ofrece la misma
+	funcionalidad.
+
+	Intenta conectar con MySQL y si no puede lo intenta con MariaDB.
+
+	Además ofrece los servicios de ejecución de sentencias SQL con 
+	sqlUpdate y sqlSelect y la posibilidad de devolución de las key generadas.
+	Permite aislar a todas las demás clases de las complejidades y detalles de
+	la conexión y construcción de sentencias SQL.
  */
 package accesoadatos;
 
@@ -44,9 +56,11 @@ public class ConexionMySQL { //
 	public PreparedStatement preparedStatement = null;
 
 	
-	
-	public ConexionMySQL() { // constructor
-	}
+	/** 
+	 * es el constructor vacío
+	 */
+	public ConexionMySQL() { 
+	} // constructor
 	
 	
 	
@@ -67,6 +81,7 @@ public class ConexionMySQL { //
 		JOptionPane.showMessageDialog(null, "Error de conexión con la BD. No pudo conectar ni con MySQL ni con MariaDB");
 		return false; // no pudo conectar
 	} // conectar
+	
 	
 	
 	
@@ -92,6 +107,7 @@ public class ConexionMySQL { //
 		}
 	} //conectar MySQL
 
+	
 
 	
 	/**
@@ -126,6 +142,7 @@ public class ConexionMySQL { //
 		}
 	} //prepararSentencia
 	
+	
 
 	
 	/**
@@ -140,6 +157,7 @@ public class ConexionMySQL { //
 			JOptionPane.showMessageDialog(null, "Error al cerrar sentencia SQL: " + ex.getMessage());
 		}
 	} // cerrarSentencia
+	
 	
 	
 	
@@ -168,6 +186,8 @@ public class ConexionMySQL { //
 	} //sqlUpdate
 	
 	
+	
+	
 	/**
 	 * Recibe un string con el comando SQL SELECT a ejecutar 
 	 * y se ocupa de ejecutarlo. Devuelve el ResultSet con los resultados
@@ -188,6 +208,8 @@ public class ConexionMySQL { //
 			}
 		}
 	} //sqlSelect
+	
+	
 	
 	
 	/**

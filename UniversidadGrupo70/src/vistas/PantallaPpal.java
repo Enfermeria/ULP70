@@ -1,7 +1,16 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+	Trabajo práctico trasversal de la Guía 5 del curso Desarrollo de Apps
+	Universidad de La Punta en el marco del proyecto Argentina Programa 4.0
+
+	Integrantes:
+		John David Molina Velarde
+		Leticia Mores
+		Enrique Germán Martínez
+		Carlos Eduardo Beltrán
+
+	Esta es la pantalla principal del sistema de gestión administrativo de
+	alumnos de la ULP. Permite invocar al CRUD de Alumnos, de Materias y de
+	Inscripciones, además de permitir invocar al CRUD de usuarios admnistrativos.
  */
 package vistas;
 
@@ -10,12 +19,12 @@ import java.awt.Toolkit;
 
 /**
  *
- * @author john
+ * @author John David Molina Velarde, Leticia Mores, Enrique Germán Martínez, Carlos Eduardo Beltrán
  */
 public class PantallaPpal extends javax.swing.JFrame {
 
 	/**
-	 * Creates new form PantallaPpal
+	 * Constructor
 	 */
 	public PantallaPpal() {
 		initComponents();
@@ -142,7 +151,9 @@ public class PantallaPpal extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
 	
-	
+	/**
+	 * Carga una imagen de la ULP en el fondo del escritorio.
+	 */
 	private void mostrarFondo(){
 		escritorio.setLayer(jLabel1, javax.swing.JLayeredPane.DEFAULT_LAYER);
 		javax.swing.GroupLayout escritorioLayout = new javax.swing.GroupLayout(escritorio);
@@ -155,13 +166,17 @@ public class PantallaPpal extends javax.swing.JFrame {
             escritorioLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, 600, Short.MAX_VALUE)
         );
-	}
+	} // mostrarFondo
 	
 	
 	
+	/**
+	 * Cdo el usuario elige el menú de Gestión de Alumos, invoca al CRUD Alumnos.
+	 * @param evt 
+	 */
     private void menuGestionAlumnosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuGestionAlumnosActionPerformed
         escritorio.removeAll(); // cierro todas las ventanas del escritorio
-		mostrarFondo();
+		mostrarFondo(); // recargo la foto de la ULP
 		escritorio.repaint();
 		
 		CrudAlumnos ga = new CrudAlumnos(); // creo un internal Frame
@@ -171,14 +186,26 @@ public class PantallaPpal extends javax.swing.JFrame {
 		escritorio.moveToFront(ga); //pongo la ventana al frente:
     }//GEN-LAST:event_menuGestionAlumnosActionPerformed
 
+	
+	
+	/**
+	 * Cuando el usuario elige el menú de Salir. Cierra la ventana
+	 * @param evt 
+	 */
     private void menuSalirSistemaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuSalirSistemaActionPerformed
         dispose();//cierra la ventana
 		//System.exit(0);// termina el programa
     }//GEN-LAST:event_menuSalirSistemaActionPerformed
 
+	
+	
+	/**
+	 * Cuando el usuario elige el menú Gestión Materias. Invoca al CRUD de materias.
+	 * @param evt 
+	 */
     private void menuGestionMateriasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuGestionMateriasActionPerformed
         escritorio.removeAll(); // cierro todas las ventanas del escritorio
-		mostrarFondo();
+		mostrarFondo(); //recargo la foto de la ULP
 		escritorio.repaint();
 		
 		CrudMaterias gm = new CrudMaterias(); // creo un internal Frame
@@ -188,9 +215,16 @@ public class PantallaPpal extends javax.swing.JFrame {
 		escritorio.moveToFront(gm); //pongo la ventana al frente:
     }//GEN-LAST:event_menuGestionMateriasActionPerformed
 
+	
+	
+	/**
+	 * Cuando el usuario elige el menú de gestión de Inscripciones por Alumno
+	 * Invoca al Crud de Inscripciones organizado por alumnos
+	 * @param evt 
+	 */
     private void menuGestionInscripcionesporAlumnoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuGestionInscripcionesporAlumnoActionPerformed
         escritorio.removeAll(); // cierro todas las ventanas del escritorio
-		mostrarFondo();
+		mostrarFondo(); // recargo la foto de fondo de la ULP
 		escritorio.repaint();
 		
 		CrudInscripcionesXAlumno gi = new CrudInscripcionesXAlumno(); // creo un internal Frame
@@ -200,9 +234,16 @@ public class PantallaPpal extends javax.swing.JFrame {
 		escritorio.moveToFront(gi); //pongo la ventana al frente:
     }//GEN-LAST:event_menuGestionInscripcionesporAlumnoActionPerformed
 
+	
+	
+	/**
+	 * Cuando el usuario elige el menú de gestión de Inscripciones por Materia
+	 * Invoca al Crud de Inscripciones organizado por materias
+	 * @param evt 
+	 */
     private void menuGestionInscripcionesporMateriaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuGestionInscripcionesporMateriaActionPerformed
         escritorio.removeAll(); // cierro todas las ventanas del escritorio
-		mostrarFondo();
+		mostrarFondo(); //recarga el fondo con la foto de la ULP
 		escritorio.repaint();
 		
 		CrudInscripcionesXMateria gi = new CrudInscripcionesXMateria(); // creo un internal Frame
@@ -213,12 +254,19 @@ public class PantallaPpal extends javax.swing.JFrame {
     }//GEN-LAST:event_menuGestionInscripcionesporMateriaActionPerformed
 
 	
+	/**
+	 * Permite cambiar el icono de la ventana y de la barra de tareas para que
+	 * sea el ícono de la ULP
+	 * @return 
+	 */
 	@Override
 	public Image getIconImage() { // defino el icono del jFrame
 		Image retValue = Toolkit.getDefaultToolkit().
 				getImage(ClassLoader.getSystemResource("imagenes/ulp_32x32.png")); //icono de la ULP
 		return retValue;
-	}
+	} //getIconImage
+	
+	
 	
 	/**
 	 * @param args the command line arguments
@@ -253,7 +301,9 @@ public class PantallaPpal extends javax.swing.JFrame {
 				new PantallaPpal().setVisible(true);
 			}
 		});
-	}
+	} // main
+	
+	
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JDesktopPane escritorio;

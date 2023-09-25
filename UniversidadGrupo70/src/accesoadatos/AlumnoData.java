@@ -7,12 +7,11 @@
 		Leticia Mores
 		Enrique Germán Martínez
 		Carlos Eduardo Beltrán
+
+	Controlador de Alumno. Permite almacenar y recuperar alumnos de la bd.
  */
 
 
-/*
-Controlador de Alumno. Permite almacenar y recuperar alumnos de la BD.
- */
 package accesoadatos;
 
 import static accesoadatos.Utils.*;
@@ -35,11 +34,16 @@ public class AlumnoData {
 	ConexionMySQL conexion; //gestiona la conexión con la bd
 	public enum OrdenacionAlumno {PORIDALUMNO, PORDNI, PORAPYNO}; //tipo de ordenamiento
 	
+	
+	/**
+	 * constructor. Gestiona la conexión con la bd.
+	 */
 	public AlumnoData() {
 		conexion = new ConexionMySQL();
 		conexion.conectar(); //esto es opcional. Podría ponerse en el main.
 	} //AlumnoData
 
+	
 
 	/**
 	 * agrega el alumno a la BD. 
@@ -63,6 +67,8 @@ public class AlumnoData {
 	} //altaAlumno
 	
 	
+	
+	
 	/**
 	 * Da de baja al alumno de la BD.
 	 * @param alumno el alumno que se dará debaja (usando su idalumno)
@@ -71,6 +77,8 @@ public class AlumnoData {
 	public boolean bajaAlumno(Alumno alumno){// 
 		return bajaAlumno(alumno.getIdalumno()); // llama a la baja usando el idalumno
 	} //bajaAlumno
+	
+	
 	
 	
 	/**
@@ -103,10 +111,11 @@ public class AlumnoData {
 	
 	
 	
+	
 	/**
 	 * Da de baja al alumno de la BD en base al id. Si está con inscripciones, 
 	 * también las da de baja.
-	 * @param id es el idalumno del alumno que se dará de baja
+	 * @param idAlumno es el idalumno del alumno que se dará de baja
 	 * @return  true si pudo darlo de baja
 	 */
 	public boolean bajaAlumnoconInscripcionesEnCascada(int idAlumno){// devuelve true si pudo darlo de baja
@@ -161,6 +170,9 @@ public class AlumnoData {
 	} //modificarAlumno
 	
 	
+	
+	
+	
 	/**
 	 * Dado un resultSet lo convierte en un Alumno
 	 * @param rs es el ResultSet que se pasa para convertirlo en el objeto Alumno
@@ -183,6 +195,9 @@ public class AlumnoData {
 	} // resultSet2Alumno
 	
 	
+	
+	
+	
 	/**
 	 * Devuelve una lista con los alumnos de la base de datos ordenados por idalumno
 	 * @return la lista de alumnos
@@ -190,6 +205,9 @@ public class AlumnoData {
 	public List<Alumno> getListaAlumnos(){ 
 		return getListaAlumnos(OrdenacionAlumno.PORIDALUMNO);
 	} // getListaAlumnos
+	
+	
+	
 	
 	
 	/**
@@ -224,6 +242,8 @@ public class AlumnoData {
 		}
 		return lista;
 	} //getListaAlumnos
+	
+	
 	
 	
 	
@@ -295,6 +315,8 @@ public class AlumnoData {
 	
 	
 	
+	
+	
 	/**
 	 * Devuelve el alumno con ese idalumno
 	 * @param id es el idalumno para identificarlo
@@ -316,6 +338,9 @@ public class AlumnoData {
 		}
 		return alumno;
 	} //getAlumno
+	
+	
+	
 	
 	
 	/**

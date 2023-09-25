@@ -22,18 +22,18 @@ import vistas.AutogestionAlumnos;
 public class UniversidadGrupo70 {
 
 	public static void main(String[] args) {
-		//Entrada al sistema de gestión administrativa directamente
-		//PantallaPpal pantallaPpal = new PantallaPpal(); //creo una pantallaPpal
-		//pantallaPpal.setVisible(true); // lo hago visible
-		//pantallaPpal.setLocationRelativeTo(null); // abrirlo en el centro		
-		
-		//Entrada a la pantalla de login
+		//Entrada al sistema de gestión adminis
+		//Invoco a la pantalla de login, quien verificará al usuario
+		// y si es administrativo (está en la bd en la tabla Usuario) ese login
+		// llamará al sistema de gestión administrativa (PantallaPpal).
+		// Si es un alumno (está en la bd en la tabla Alumno) ese login llamará
+		// al sistema de autogestión de alumnos
 		Login login = new Login(); //creo una pantalla de login
 		login.setVisible(true); // lo hago visible
 		login.setLocationRelativeTo(null); // abrirlo en el centro		
-	}
+	} //main
 	
-}
+} // UniversidadGrupo70
 
 
 

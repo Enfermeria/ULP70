@@ -1,4 +1,23 @@
+/*
+	Trabajo práctico trasversal de la Guía 5 del curso Desarrollo de Apps
+	Universidad de La Punta en el marco del proyecto Argentina Programa 4.0
 
+	Integrantes:
+		John David Molina Velarde
+		Leticia Mores
+		Enrique Germán Martínez
+		Carlos Eduardo Beltrán
+
+	Esta es la ventana del CRUD de Inscrpciones organizadas por materia.
+	Permite hacer click en la lista de materias y muestra los alumnos
+	inscriptos en dicha materia y los alumnos disponibles para 	inscribirse. 
+	Además permite buscar por diversos campos y cambiar el orden de visualización.
+
+	Luego, si hace click seleccionando un alumno inscripto, permite 
+	desinscribirlo con el boton desinscribirse.
+	Similarmente, si hace click seleccionando un alumnoo disponible, permite
+	inscribirlo con el botón inscribirse.
+ */
 package vistas;
 
 import accesoadatos.AlumnoData;
@@ -24,16 +43,15 @@ public class CrudInscripcionesXMateria extends javax.swing.JInternalFrame {
 	public static List<Materia> listaMaterias;
     public static List<Inscripcion> listaInscripciones; //lista de inscripciones de un alumno
     public static List<Alumno> listaAlumnosDisponibles;//lista de materias en las que NO está inscripto un alumno
-	private final AlumnoData alumnoData;	
+	private final AlumnoData alumnoData;	// conexión a la bd
     private final MateriaData materiaData;
     private final InscripcionData inscripcionData;
-	// private enum TipoEdicion {AGREGAR, MODIFICAR, BUSCAR};
-	private OrdenacionMateria ordenacion = OrdenacionMateria.PORIDMATERIA; // defino el tipo de orden por defecto 
+	private OrdenacionMateria ordenacion = OrdenacionMateria.PORIDMATERIA; // defino el tipo de orden por defecto que mostrará
 	private FiltroMaterias filtro = new FiltroMaterias();  //el filtro de búsqueda
 	
 
 	/**
-	 * Creates new form GestionInscripciones
+	 * Constructor. Hace las conexiones con la bd.
 	 */
 	public CrudInscripcionesXMateria() {
 		initComponents();
@@ -48,13 +66,16 @@ public class CrudInscripcionesXMateria extends javax.swing.JInternalFrame {
 		cargarTablaMaterias(); // cargo la tabla con los alumnos
 	} // constructor
 
-	/** carga la lista de alumnos de la BD */
+	
+	
+	/** carga la lista de materias de la BD */
 	private void cargarListaMaterias(){ 
 		if (filtro.estoyFiltrando) 
 			listaMaterias = materiaData.getListaMateriasXCriterioDeBusqueda(filtro.id, filtro.anio, filtro.nombre, ordenacion);
 		else
 			listaMaterias = materiaData.getListaMaterias(ordenacion);
-	}//cargarListaAlumnos
+	}//cargarListaMaterias
+	
 	
 	
 	/** carga materias de la lista a la tabla */
@@ -87,11 +108,12 @@ public class CrudInscripcionesXMateria extends javax.swing.JInternalFrame {
 	
 	
 	
-	/**Carga listaMateriasInscriptas a la tablaMateriasInscriptas y 
- listaAlumnosDisponibles a la tablaMateriasDisponibles
+	/**
+	 * Carga listaAlumnosInscriptos a la tablaAlumnosInscriptos y 
+	 * listaAlumnosDisponibles a la tablaAlumnosDisponibles
 	 */
 	private void cargarTablaAlumnosInscriptosYDisponibles(){
-		//borro las filas de la tablaAlumnosInscriptas
+		//borro las filas de la tablaAlumnosInscriptos
 		for (int fila = modeloTablaAlumnosInscriptos.getRowCount() -  1; fila >= 0; fila--)
 			modeloTablaAlumnosInscriptos.removeRow(fila);
 		
@@ -122,13 +144,13 @@ public class CrudInscripcionesXMateria extends javax.swing.JInternalFrame {
 			);
 		}
 
-		//como no hay fila seleccionada en la tablaMateriasInscriptas, deshabilito el botón Desinscribirse
+		//como no hay fila seleccionada en la tablaAlumnosInscriptos, deshabilito el botón Desinscribirse
 		if (tablaAlumnosInscriptos.getSelectedRow() == -1) // si no hay alguna fila seleccionada
 			btnDesinscribirse.setEnabled(false); // deshabilito el botón de Desinscribir
 		else //hay una fila seleccionada
 			btnDesinscribirse.setEnabled(true); // deshabilito el botón de Desinscribir
         
-		//como no hay fila seleccionada tablaMateriasDisponibles, deshabilito el botón Inscribirse
+		//como no hay fila seleccionada tablaAlumnosDisponibles, deshabilito el botón Inscribirse
 		if (tablaAlumnosDisponibles.getSelectedRow() == -1) // si no hay alguna fila seleccionada
 			btnInscribirse.setEnabled(false); // deshabilito el botón de Inscribirse
 		else //hay una fila seleccionada
@@ -139,20 +161,20 @@ public class CrudInscripcionesXMateria extends javax.swing.JInternalFrame {
 	
 	
 	/**
-	 * En base al idAlumno que nos pasan, cargamos la lista de materias 
-	 * inscriptas y disponibles de ese alumno.
+	 * En base al idMateria que nos pasan, cargamos la lista de alumnos 
+	 * inscriptos y disponibles para esa materia.
 	 * @param idAlumno 
 	 */
 	private void cargarListaAlumnos(int idMateria){
 		listaInscripciones = inscripcionData.getListaInscripcionesDeLaMateria(idMateria);
 		listaAlumnosDisponibles = inscripcionData.getListaAlumnosDisponiblesXMateria(idMateria);
-	}// cargarListaMaterias
+	}// cargarListaAlumnos
 
         
 		
 		
 	/**
-	 * como no hay ningun alumno seleccionado, borra los datos de las tablas de materias.
+	 * como no hay ninguna materia seleccionado, borra los datos de las tablas de alumnos
 	 */
 	private void borrarTablaAlumnosInscriptosYDisponibles(){
 		//borro las filas de la tabla de materias inscriptas
@@ -161,7 +183,7 @@ public class CrudInscripcionesXMateria extends javax.swing.JInternalFrame {
 		//borro las filas de la tabla de materias disponibles
 		for (int fila = modeloTablaAlumnosDisponibles.getRowCount() -  1; fila >= 0; fila--)
 			modeloTablaAlumnosDisponibles.removeRow(fila);
-	}// borrarTablaMaterias
+	}// borrarTablaAlumnosInscriptosYDisponibles
 
 		
 	
@@ -230,7 +252,7 @@ public class CrudInscripcionesXMateria extends javax.swing.JInternalFrame {
 
 	
 	
-	/** pongo los campos txtfield en blanco y deselecciono la fila de tabla */
+	/** pongo los campos txtfield en blanco*/
 	private void limpiarCampos(){
 		//pongo los campos en blanco
 		txtId.setText("");
@@ -246,11 +268,12 @@ public class CrudInscripcionesXMateria extends javax.swing.JInternalFrame {
 	 * @param numfila el número de fila a cargar a los campos
 	 */
 	private void filaTabla2Campos(int numfila){
-		txtId.setText(tablaMaterias.getValueAt(numfila, 0)+"");
-		txtAnio.setText(tablaMaterias.getValueAt(numfila, 1)+"");
-		txtNombre.setText((String)tablaMaterias.getValueAt(numfila, 2));		
+		txtId.setText(tablaMaterias.getValueAt(numfila, 0)+""); //idMateria
+		txtAnio.setText(tablaMaterias.getValueAt(numfila, 1)+""); // anio
+		txtNombre.setText((String)tablaMaterias.getValueAt(numfila, 2)); //nombre		
 	} //filaTabla2Campos
         
+	
         
     /**
 	 * Devuelve el idMateria de la fila seleccionada de la tabla de materias
@@ -259,8 +282,9 @@ public class CrudInscripcionesXMateria extends javax.swing.JInternalFrame {
 	private int filaTablaMaterias2IdMateria(int numfila){
 		return (Integer)tablaMaterias.getValueAt(numfila, 0);			
 	} //filaTabla2IdAlumno
-
-
+	
+	
+	
     /**
 	 * Devuelve el idAlumno de la fila seleccionada de la tabla de disponibles
 	 * @param numfila el número de fila a cargar a los campos
@@ -279,17 +303,28 @@ public class CrudInscripcionesXMateria extends javax.swing.JInternalFrame {
 		return (Integer)tablaAlumnosInscriptos.getValueAt(numfila, 1);			
 	} //filaTablaAlummnosInscriptos2IdAlumno
 	
+	
+	
+	/**
+	 * Devuelve el idInscripcion de la fila seleccionada de la tabla de inscriptos
+	 * @param numfila el número de fila a cargar a los campos
+	 */
 	private int filaTablaAlumnosInscriptos2IdInscripcion(int numfila){
 		return (Integer)tablaAlumnosInscriptos.getValueAt(numfila, 0);			
 	} //filaTablaAlumnosInscriptos2IdInscripcion
 	
 	
+	/**
+	 * Devuelve la nota de la fila seleccionada de la tabla de inscriptos
+	 * @param numfila el número de fila a cargar a los campos
+	 */
 	private double filaTablaAlumnosInscriptos2Nota(int numfila){
 		return (Double)tablaAlumnosInscriptos.getValueAt(numfila, 5);			
 	} //filaTablaAlumnosInscriptos2Nota
 	
 	
 
+	
 	/** 
 	 * cambia titulo y color de panel de tabla de alumnos para reflejar que 
 	 * está filtrada. Habilita btnResetearFiltro
@@ -303,8 +338,9 @@ public class CrudInscripcionesXMateria extends javax.swing.JInternalFrame {
 	} //setearFiltro
 	
 	
+	
 	/** 
-	 * Restaur titulo y color de panel de tablaAlumnos para reflejar que 
+	 * Restaura titulo y color de panel de tablaAlumnos para reflejar que 
 	 * ya no está filtrada. Deshabilita btnResetearFiltro
 	*/
 	private void resetearFiltro(){
@@ -719,6 +755,10 @@ public class CrudInscripcionesXMateria extends javax.swing.JInternalFrame {
 	
 	
 	
+	/**
+	 * Método llamado al hacer click en el botón buscar.
+	 * @param evt 
+	 */
     private void btnBuscarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBuscarActionPerformed
         buscarMateria();
     }//GEN-LAST:event_btnBuscarActionPerformed
@@ -726,6 +766,10 @@ public class CrudInscripcionesXMateria extends javax.swing.JInternalFrame {
 	
 	
 	
+	/**
+	 * Método llamado al hacer click en el botón Salir. Cierra la ventana.
+	 * @param evt 
+	 */
     private void btnSalirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSalirActionPerformed
         dispose();//cierra la ventana
     }//GEN-LAST:event_btnSalirActionPerformed
@@ -733,6 +777,11 @@ public class CrudInscripcionesXMateria extends javax.swing.JInternalFrame {
 	
 	
 	
+	/**
+	 * Método llamado al seleccionar un ordenamiento. Permite elegir en qué 
+	 * orden se muestran las materias de la tabla.
+	 * @param evt 
+	 */
     private void cboxOrdenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cboxOrdenActionPerformed
         if (cboxOrden.getSelectedIndex() == 0)
 			ordenacion = MateriaData.OrdenacionMateria.PORIDMATERIA;
@@ -750,6 +799,13 @@ public class CrudInscripcionesXMateria extends javax.swing.JInternalFrame {
 	
 	
 	
+	
+	/**
+	 * Al hacer click sobre una materia de la tabla de materias para seleccionarla.
+	 * Muestra las tablas de alumnos que están inscriptos en dicha materia  y 
+	 * la tabla de alumnos disponibles para inscribirse.
+	 * @param evt 
+	 */
     private void tablaMateriasMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tablaMateriasMouseClicked
         //tabla.addRowSelectionInterval(filaTabla, filaTabla); //selecciono esa fila de la tabla
         if (tablaMaterias.getSelectedRow() != -1){ // si hay alguna fila seleccionada
@@ -768,6 +824,12 @@ public class CrudInscripcionesXMateria extends javax.swing.JInternalFrame {
 	
 	
 	
+	/**
+	 * Saca el filtro de búsqueda, mostrando todos las materias. También cambia
+	 * el título y color de la tabla de materias para reflejar que ya no se está
+	 * usando el filtro.
+	 * @param evt 
+	 */
     private void btnResetearFiltroActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnResetearFiltroActionPerformed
         resetearFiltro();
         cargarListaMaterias();
@@ -779,6 +841,11 @@ public class CrudInscripcionesXMateria extends javax.swing.JInternalFrame {
 	
 	
 	
+	/**
+	 * Cuando se selecciona un alumno de la tabla de alumnos inscriptos.
+	 * Habilita el botón desinscribirse.
+	 * @param evt 
+	 */
     private void tablaAlumnosInscriptosMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tablaAlumnosInscriptosMouseClicked
         if (tablaAlumnosInscriptos.getSelectedRow() != -1){ // si hay alguna fila seleccionada
 			btnDesinscribirse.setEnabled(false); // deshabilito botón Desinscribirse.
@@ -792,6 +859,12 @@ public class CrudInscripcionesXMateria extends javax.swing.JInternalFrame {
 	
 	
 	
+	/**
+	 * Método llamado al hacer click en el botón desinscribirse. Saca a ese 
+	 * alumno seleccionado de la lista de alumnos en las que la materia está
+	 * inscripta.
+	 * @param evt 
+	 */
     private void btnDesinscribirseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDesinscribirseActionPerformed
 		if (tablaAlumnosInscriptos.getSelectedRow() != -1){ // si hay alguna fila seleccionada
 			btnDesinscribirse.setEnabled(false); // deshabilito botón Desinscribirse.
@@ -815,7 +888,11 @@ public class CrudInscripcionesXMateria extends javax.swing.JInternalFrame {
 	
 	
 	
-	
+	/**
+	 * Cuando se selecciona una alumno de la tabla de alumnos disponibles.
+	 * Habilita el botón inscribirse.
+	 * @param evt 
+	 */
     private void tablaAlumnosDisponiblesMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tablaAlumnosDisponiblesMouseClicked
         //tabla.addRowSelectionInterval(filaTabla, filaTabla); //selecciono esa fila de la tabla
         if (tablaAlumnosDisponibles.getSelectedRow() != -1){ // si hay alguna fila seleccionada
@@ -831,7 +908,11 @@ public class CrudInscripcionesXMateria extends javax.swing.JInternalFrame {
 	
 	
 	
-	
+	/**
+	 * Método llamado al hacer click en el botón inscribirse. Inscribe en esa 
+	 * materia al alumno seleccionado de la lista de alumnos disponibles.
+	 * @param evt 
+	 */
     private void btnInscribirseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnInscribirseActionPerformed
         if (tablaAlumnosDisponibles.getSelectedRow() != -1){ // si hay alguna fila seleccionada
 			btnInscribirse.setEnabled(false); // deshabilito botón Inscribirse.
@@ -852,6 +933,15 @@ public class CrudInscripcionesXMateria extends javax.swing.JInternalFrame {
 		}
     }//GEN-LAST:event_btnInscribirseActionPerformed
 
+	
+	
+	
+	/**
+	 * Este método se llama cuando cambió la nota de la fila seleccionada de la
+	 * tabla de alumnos en las que el materia está inscripto. Usa esa nota para
+	 * actualizar la bd.
+	 * @param evt 
+	 */
     private void tablaAlumnosInscriptosPropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_tablaAlumnosInscriptosPropertyChange
         //supuestamente cambio la nota
 		//System.out.println("CAMBIO LA NOTA!!!!!!!!!!");

@@ -7,11 +7,8 @@
 		Leticia Mores
 		Enrique Germán Martínez
 		Carlos Eduardo Beltrán
- */
 
-
-/*
-Controlador de Usuario. Permite almacenar y recuperar usuarios de la BD.
+	Controlador de Usuario. Permite almacenar y recuperar usuarios de la BD.
  */
 package accesoadatos;
 

@@ -1,7 +1,14 @@
 /*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
+	Trabajo práctico trasversal de la Guía 5 del curso Desarrollo de Apps
+	Universidad de La Punta en el marco del proyecto Argentina Programa 4.0
+
+	Integrantes:
+		John David Molina Velarde
+		Leticia Mores
+		Enrique Germán Martínez
+		Carlos Eduardo Beltrán
  */
+
 package vistas;
 
 import accesoadatos.AlumnoData;
@@ -14,16 +21,16 @@ import javax.swing.JOptionPane;
 
 /**
  *
- * @author LENOVO
+ * @author John David Molina Velarde, Leticia Mores, Enrique Germán Martínez, Carlos Eduardo Beltrán
  */
 public class Login extends javax.swing.JFrame {
-
-    /**
-     * Creates new form Login
-     */
+	
+	/**
+	 * Constructor
+	 */
     public Login() {
         initComponents();
-    }
+    } //constructor
 
 	
 	
@@ -36,7 +43,7 @@ public class Login extends javax.swing.JFrame {
 		Image retValue = Toolkit.getDefaultToolkit().
 				getImage(ClassLoader.getSystemResource("imagenes/ulp_32x32.png")); //icono de la ULP
 		return retValue;
-	}
+	} // getIconImage
 	
 	
 	
@@ -122,22 +129,37 @@ public class Login extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+	
+	/**
+	 * Este método se llama cuando el usuario hace clíck en el botón Login.
+	 * Se conecta a la base de datos (usando UsuarioData y AlumnoData) y 
+	 * verifica si la clave es la clave maestra o la clave de un usuario
+	 * administrativo (está en la bd en la tabla Usuario), entonces ejecuta
+	 * el sistema de gestión administrativo (llama a PantallaPpal).
+	 * Si no es administrativo (en Usuario), verifica si se trata de un 
+	 * alumno (está en la bd en la tabla Alumno), entonce ejecuta el sistema de
+	 * autogestión de alumnos pasándole como parámetro los datos del alumno.
+	 * @param evt 
+	 */
     private void jBLoginActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBLoginActionPerformed
         try {
             
+			//conexión con la bd
 			UsuarioData usuarioData = new UsuarioData();
 			AlumnoData alumnoData = new AlumnoData();
 			
+			//obtengo los datos de los campos de texto
             String apellido = jTApellido.getText();
             String nombre = jTNombre.getText();
             int dni = Integer.parseInt(new String(jPassword.getPassword()));
-			Usuario usuario = usuarioData.getUsuario(apellido, nombre, dni); // intento traer ese usuario
-			Alumno alumno = alumnoData.getAlumno(apellido, nombre, dni); // intento traer ese alumno
 			
-
+			//verifico si está en la bd en la tabla de usuarios o de alumnos
+			Usuario usuario = usuarioData.getUsuario(apellido, nombre, dni); // intento traer ese usuario. Null es que no está en la bd.
+			Alumno alumno = alumnoData.getAlumno(apellido, nombre, dni); // intento traer ese alumno. Null es que no está en la bd
 			
-            if ((apellido.equalsIgnoreCase("ULP")&& nombre.equalsIgnoreCase("admin")&& dni == 12345) || 
-				(usuario != null)){ //accedo a PantallaPpal con clave maestra
+			
+            if ((apellido.equalsIgnoreCase("ULP")&& nombre.equalsIgnoreCase("admin")&& dni == 12345) //accedo a PantallaPpal con clave maestra
+				|| (usuario != null)){ // ese usuario existe en la bd tabla Usuario, por eso no es null
                 PantallaPpal pantallaPpal = new PantallaPpal(); //creo una pantallaPpal
 				pantallaPpal.setVisible(true); // lo hago visible
 				pantallaPpal.setLocationRelativeTo(null); // abrirlo en el centro
@@ -147,13 +169,19 @@ public class Login extends javax.swing.JFrame {
 					autogestionAlumnos.setVisible(true);
 					autogestionAlumnos.setLocationRelativeTo(null); // abrirlo en el centro
 					dispose(); //cierra ventana de login
-			} else
+			} else // no es uuario ni alumno válidos
 				JOptionPane.showMessageDialog(null, "Nombre, apellido o clave no corresponden a un usuario válido", "Usuario no existe", JOptionPane.ERROR_MESSAGE);
         } catch (NumberFormatException e) {
             JOptionPane.showMessageDialog(null, "La clave debe ser numerica, verifique los datos ingresados", "Numero no valido", JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_jBLoginActionPerformed
 
+	
+	
+	/**
+	 * Este método se llama cuando el usuario hace click en el botón cancel.
+	 * @param evt 
+	 */
     private void jBCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBCancelActionPerformed
         dispose(); //Cerrar la ventana
     }//GEN-LAST:event_jBCancelActionPerformed

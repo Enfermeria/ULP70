@@ -7,11 +7,8 @@
 		Leticia Mores
 		Enrique Germán Martínez
 		Carlos Eduardo Beltrán
- */
-
-
-/*
-Controlador de Alumno. Permite almacenar y recuperar alumnos de la BD.
+ 
+	Controlador de Materias. Permite almacenar y recuperar materias de la BD.
  */
 package accesoadatos;
 
@@ -35,10 +32,17 @@ public class MateriaData {
 	ConexionMySQL conexion; //gestiona la conexión con la bd
 	public enum OrdenacionMateria {PORIDMATERIA, PORANIO, PORNOMBRE}; //tipo de ordenamiento
 	
+	
+	
+	/**
+	 * Constructor
+	 */
 	public MateriaData() {
 		conexion = new ConexionMySQL();
 		conexion.conectar(); //esto es opcional. Podría ponerse en el main.
 	} //MateriaData
+	
+	
 	
 	
 	/**
@@ -63,6 +67,7 @@ public class MateriaData {
 		
 	
 	
+	
 	/**
 	 * Da de baja la materia de la BD.
 	 * @param materia la materia que se dará debaja 
@@ -71,6 +76,7 @@ public class MateriaData {
 	public boolean bajaMateria(Materia materia){// 
 		return bajaMateria(materia.getIdmateria()); // llama a la baja usando el idmateria
 	} //bajaAlumno
+	
 	
 	
 	/**
@@ -98,7 +104,8 @@ public class MateriaData {
 			mensajeError("Falló la baja de materia");;
 			return false;
 		}
-	}
+	}//bajaMateria
+	
 	
 	
 	
@@ -126,6 +133,8 @@ public class MateriaData {
 	} //modificarMateria
 	
 	
+	
+	
 	/**
 	 * Dado un resultSet lo convierte en una Materia
 	 * @param rs es el ResultSet que se pasa para convertirlo en el objeto Materia
@@ -146,6 +155,8 @@ public class MateriaData {
 	}//resultSet2Materia
 	
 	
+	
+	
 	/**
 	 * Devuelve una lista con los alumnos de la base de datos ordenados por idalumno
 	 * @return la lista de alumnos
@@ -153,6 +164,7 @@ public class MateriaData {
 	public List<Materia> getListaMaterias(){ 
 		return getListaMaterias(OrdenacionMateria.PORIDMATERIA);
 	} // getListaMaterias
+	
 	
 	
 	
@@ -188,6 +200,8 @@ public class MateriaData {
 		}
 		return lista;
 	} //getListaMaterias
+	
+	
 	
 	
 	/**

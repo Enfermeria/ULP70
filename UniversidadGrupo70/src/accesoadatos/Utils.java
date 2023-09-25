@@ -1,5 +1,14 @@
 /*
-Rutinas utiles
+	Trabajo práctico trasversal de la Guía 5 del curso Desarrollo de Apps
+	Universidad de La Punta en el marco del proyecto Argentina Programa 4.0
+
+	Integrantes:
+		John David Molina Velarde
+		Leticia Mores
+		Enrique Germán Martínez
+		Carlos Eduardo Beltrán
+
+	Rutinas utiles
  */
 package accesoadatos;
 
@@ -10,25 +19,53 @@ import java.util.Date;
 
 /**
  *
- * @author John David Molina
+ * @author John David Molina Velarde, Leticia Mores, Enrique Germán Martínez, Carlos Eduardo Beltrán
  */
 public class Utils {
-	
-	public static void mensajeError(String mensaje){ // para mandar mensaje de erro con sout o JOptionPane
+	/**
+	 * Para mandar un mensaje de error con sout o JOptionPane
+	 * @param mensaje 
+	 */
+	public static void mensajeError(String mensaje){ 
 		System.out.println(mensaje);
-	}
+	} //mensajeError
 	
+	
+	
+	
+	/**
+	 * Para mandar un mensaje con sout o JOptionPane
+	 * @param queMensaje 
+	 */
 	public static void mensaje(String queMensaje){
 		System.out.println(queMensaje);
-	}
+	} //mensaje
 	
+	
+	
+	
+	/**
+	 * Conversor de formato LocalDate a Date.
+	 * Dado un LocalDate devuelve el correspondiente Date
+	 * @param localfecha el localDate
+	 * @return el Date correspondiente
+	 */
 	public static Date localDate2Date(LocalDate localfecha){
 		ZoneId defaultZoneId = ZoneId.systemDefault(); //default time zone
 		// para pasar de LocalDate a Date: Date = local date + atStartOfDay() + default time zone + toInstant() 
 		Date fecha = Date.from(localfecha.atStartOfDay(defaultZoneId).toInstant());
 		return fecha;
-	}
+	} // localDate2Date
 	
+	
+	
+	
+	/**
+	 * Conversor de formato Date a  LocalDate.
+	 * Dado un Date devuelve el correspondiente LocalDate
+	 * @param fecha el Date
+	 * @return el LocalDate correspondiente
+	 */
 	public static LocalDate date2LocalDate(Date fecha){
 		//The java.util.Date represents date, time of the day in UTC timezone 
 		//		java.util.Date = date + time of the day + UTC time zone
@@ -50,5 +87,5 @@ public class Utils {
 		//Converting the Date to LocalDate
 		LocalDate localDate = instant.atZone(defaultZoneId).toLocalDate();
 		return localDate;
-	}
+	} //date2LocalDate
 }

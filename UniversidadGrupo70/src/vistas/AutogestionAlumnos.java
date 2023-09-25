@@ -1,4 +1,17 @@
+/*
+	Trabajo práctico trasversal de la Guía 5 del curso Desarrollo de Apps
+	Universidad de La Punta en el marco del proyecto Argentina Programa 4.0
 
+	Integrantes:
+		John David Molina Velarde
+		Leticia Mores
+		Enrique Germán Martínez
+		Carlos Eduardo Beltrán
+
+	Este es el sistema de autogestión de alumnos (recibe un alumno como parámetro)
+	Limita el acceso solo a auto inscribirse o desinscribirse de materias para
+	sí mismo.
+ */
 package vistas;
 
 import accesoadatos.AlumnoData;
@@ -21,13 +34,16 @@ public class AutogestionAlumnos extends javax.swing.JFrame {
     DefaultTableModel modeloTablaMateriasInscriptas, modeloTablaMateriasDisponibles;
     public static List<Inscripcion> listaInscripciones; //lista de inscripciones de un alumno
     public static List<Materia> listaMateriasDisponibles;//lista de materias en las que NO está inscripto un alumno
-    private final AlumnoData alumnoData;	
+    private final AlumnoData alumnoData;	//acceso a bd
     private final MateriaData materiaData;
     private final InscripcionData inscripcionData;
-	// private enum TipoEdicion {AGREGAR, MODIFICAR, BUSCAR};
 	
-    private Alumno alumno;   
+    private Alumno alumno;   // acá almaceno el alumno con el que estoy trabajando
    
+	/**
+	 * Es el constructor. Hace las conexiones a la bd.
+	 * @param alumno Es el alumno con el que se está trabajando
+	 */
     public AutogestionAlumnos(Alumno alumno) {
 	initComponents();
         this.alumno= alumno;
@@ -42,8 +58,6 @@ public class AutogestionAlumnos extends javax.swing.JFrame {
 		txtDni.setText("" + alumno.getDni());
 		txtApellido.setText(alumno.getApellido());
 		txtNombre.setText(alumno.getNombre());
-		//jdcFechaNacimiento.setDate(new Date(76, 8, 15)); 
-		//checkboxEstado.setSelected(true);
 
 		//cargo las materias inscriptas y disponibles de ese alumno
 		cargarListaMaterias(alumno.getIdalumno());
@@ -53,7 +67,8 @@ public class AutogestionAlumnos extends javax.swing.JFrame {
 	
 	
 	
-	/**Carga listaMateriasInscriptas a la tablaMateriasInscriptas y 
+	/**
+	 * Carga listaMateriasInscriptas a la tablaMateriasInscriptas y 
 	 * listaMateriasDisponibles a la tablaMateriasDisponibles
 	 */
 	private void cargarTablaMaterias(){
@@ -137,6 +152,7 @@ public class AutogestionAlumnos extends javax.swing.JFrame {
 		return Integer.valueOf(txtId.getText()); // obtengo el identificador el alumno		
 	} //txtIdAlumno2IdAlumno
 
+	
 
     /**
 	 * Devuelve el idMateria de la fila seleccionada de la tabla de disponibles
@@ -156,11 +172,22 @@ public class AutogestionAlumnos extends javax.swing.JFrame {
 		return (Integer)tablaMateriasInscriptas.getValueAt(numfila, 1);			
 	} //filaTablaInscriptas2IdMateria
 	
+	
+	/**
+	 * devuelve el campo idInscripcion de la fila activa de la tabla en pantalla de materias inscriptas
+	 * @param numfila
+	 * @return 
+	 */
 	private int filaTablaInscriptas2IdInscripcion(int numfila){
 		return (Integer)tablaMateriasInscriptas.getValueAt(numfila, 0);			
 	} //filaTablaInscriptas2IdMateria
 	
 	
+	/**
+	 * devuelve el campo nota de la fila activa de la tabla en pantalla de materias inscriptas.
+	 * @param numfila
+	 * @return 
+	 */
 	private double filaTablaInscriptas2Nota(int numfila){
 		return (Double)tablaMateriasInscriptas.getValueAt(numfila, 4);			
 	} //filaTablaInscriptas2IdMateria
@@ -177,7 +204,7 @@ public class AutogestionAlumnos extends javax.swing.JFrame {
 		Image retValue = Toolkit.getDefaultToolkit().
 				getImage(ClassLoader.getSystemResource("imagenes/ulp_32x32.png")); //icono de la ULP
 		return retValue;
-	}
+	} // getIconImage
 	
 	
 	
@@ -186,7 +213,6 @@ public class AutogestionAlumnos extends javax.swing.JFrame {
 
 	
 
-	
 	
 	
 	
@@ -481,7 +507,11 @@ public class AutogestionAlumnos extends javax.swing.JFrame {
 	
 	
 	
-	
+/**
+ * Este método se llama cuando se hace click sobre una fila de la tabla de materias inscriptas.
+ * Si se seleccionó una materia de la tabla, habilita el botón para desinscribirse.
+ * @param evt 
+ */	
     private void tablaMateriasInscriptasMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tablaMateriasInscriptasMouseClicked
         if (tablaMateriasInscriptas.getSelectedRow() == -1){ // si no hay alguna fila seleccionada
             btnDesinscribirse.setEnabled(false); // deshabilito botón Desinscribirse.
@@ -493,7 +523,12 @@ public class AutogestionAlumnos extends javax.swing.JFrame {
 	
 	
 	
-	
+	/**
+	 * Este método se llama cuando se hace click en pantalla sobre una fila
+	 * de las materias disponibles para inscribirse. Si se seleccionó una 
+	 * materia disponible, habilita el botón de inscribirse.
+	 * @param evt 
+	 */
     private void tablaMateriasDisponiblesMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tablaMateriasDisponiblesMouseClicked
         if (tablaMateriasDisponibles.getSelectedRow() == -1){ // si no hay alguna fila seleccionada
             btnInscribirse.setEnabled(false); // deshabilito botón Inscribirse.
@@ -502,6 +537,14 @@ public class AutogestionAlumnos extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_tablaMateriasDisponiblesMouseClicked
 
+	
+	
+	/**
+	 * Este método se llama cuando se hace click sobre el botón inscribirse.
+	 * En base a la materia seleccionada de la tabla de materias disponibles,
+	 * inscribe a ese alumno en dicha materia.
+	 * @param evt 
+	 */
     private void btnInscribirseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnInscribirseActionPerformed
         if (tablaMateriasDisponibles.getSelectedRow() != -1){ // si hay alguna fila seleccionada
             btnInscribirse.setEnabled(false); // deshabilito botón Inscribirse.
@@ -518,6 +561,14 @@ public class AutogestionAlumnos extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_btnInscribirseActionPerformed
 
+	
+	
+	/**
+	 * Este método es llamado cuando se hace click sobre el botón Desinscribirse.
+	 * En base a la materia seleccionada de la tabla de materias inscriptas de
+	 * dicho alumno, desinscribe a dicho alumno de esa materia (pierde la nota).
+	 * @param evt 
+	 */
     private void btnDesinscribirseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDesinscribirseActionPerformed
         if (tablaMateriasInscriptas.getSelectedRow() != -1){ // si hay alguna fila seleccionada
             btnDesinscribirse.setEnabled(false); // deshabilito botón Desinscribirse.
@@ -534,10 +585,20 @@ public class AutogestionAlumnos extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_btnDesinscribirseActionPerformed
 
+	
+	
+	/**
+	 * Este método es llamado cuando se hace click en el botón de Salir.
+	 * Cierra la pantalla de Autogestión.
+	 * @param evt 
+	 */
     private void btnSalirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSalirActionPerformed
         dispose(); // cierra la ventana
     }//GEN-LAST:event_btnSalirActionPerformed
 
+	
+	
+	
 	/**
 	 * @param args the command line arguments
 	 */
@@ -573,6 +634,8 @@ public class AutogestionAlumnos extends javax.swing.JFrame {
 //		});
 	}
 
+	
+	
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnDesinscribirse;
     private javax.swing.JButton btnInscribirse;
