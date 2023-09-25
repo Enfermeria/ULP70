@@ -49,6 +49,9 @@ public class PantallaPpal extends javax.swing.JFrame {
         jMenu3 = new javax.swing.JMenu();
         menuGestionInscripcionesporAlumno = new javax.swing.JMenuItem();
         menuGestionInscripcionesporMateria = new javax.swing.JMenuItem();
+        jMenu4 = new javax.swing.JMenu();
+        menuGestionUsuarios = new javax.swing.JMenuItem();
+        menuAcercaDe = new javax.swing.JMenuItem();
         menuSalir = new javax.swing.JMenu();
         menuSalirSistema = new javax.swing.JMenuItem();
 
@@ -119,6 +122,26 @@ public class PantallaPpal extends javax.swing.JFrame {
         jMenu3.add(menuGestionInscripcionesporMateria);
 
         jMenuBar1.add(jMenu3);
+
+        jMenu4.setText("Configuración");
+
+        menuGestionUsuarios.setText("Gestión de Usuarios");
+        menuGestionUsuarios.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                menuGestionUsuariosActionPerformed(evt);
+            }
+        });
+        jMenu4.add(menuGestionUsuarios);
+
+        menuAcercaDe.setText("Acerca de los autores");
+        menuAcercaDe.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                menuAcercaDeActionPerformed(evt);
+            }
+        });
+        jMenu4.add(menuAcercaDe);
+
+        jMenuBar1.add(jMenu4);
 
         menuSalir.setText("Salir");
 
@@ -254,6 +277,38 @@ public class PantallaPpal extends javax.swing.JFrame {
     }//GEN-LAST:event_menuGestionInscripcionesporMateriaActionPerformed
 
 	
+	
+	
+	/**
+	 * Cuando el usuario elige el menú de Acerca de los Autores
+	 * Muestra información de los creadores del sistema
+	 * @param evt 
+	 */
+    private void menuAcercaDeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuAcercaDeActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_menuAcercaDeActionPerformed
+
+	
+	
+	/**
+	 * Cuando el usuario elige el menú Gestión de Usuarios
+	 * Invoca al CRUD de usuarios autorizados a ingresar a la parte administrativa
+	 * del sistema (los alumnos solo pueden ver la pantalla de autogestión)
+	 * @param evt 
+	 */
+    private void menuGestionUsuariosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuGestionUsuariosActionPerformed
+        escritorio.removeAll(); // cierro todas las ventanas del escritorio
+		mostrarFondo(); //recarga el fondo con la foto de la ULP
+		escritorio.repaint();
+		
+		CrudUsuarios gu = new CrudUsuarios(); // creo un internal Frame
+		gu.setVisible(true); // lo pongo visible
+		
+		escritorio.add(gu); // lo pongo en el escritorio
+		escritorio.moveToFront(gu); //pongo la ventana al frente:
+    }//GEN-LAST:event_menuGestionUsuariosActionPerformed
+
+	
 	/**
 	 * Permite cambiar el icono de la ventana y de la barra de tareas para que
 	 * sea el ícono de la ULP
@@ -311,11 +366,14 @@ public class PantallaPpal extends javax.swing.JFrame {
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenu jMenu2;
     private javax.swing.JMenu jMenu3;
+    private javax.swing.JMenu jMenu4;
     private javax.swing.JMenuBar jMenuBar1;
+    private javax.swing.JMenuItem menuAcercaDe;
     private javax.swing.JMenuItem menuGestionAlumnos;
     private javax.swing.JMenuItem menuGestionInscripcionesporAlumno;
     private javax.swing.JMenuItem menuGestionInscripcionesporMateria;
     private javax.swing.JMenuItem menuGestionMaterias;
+    private javax.swing.JMenuItem menuGestionUsuarios;
     private javax.swing.JMenu menuSalir;
     private javax.swing.JMenuItem menuSalirSistema;
     // End of variables declaration//GEN-END:variables
