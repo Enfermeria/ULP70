@@ -43,9 +43,9 @@ public class UsuarioData {
 	 */
 	public boolean altaUsuario(Usuario usuario){// 
 		// una alternativa es usar ?,?,? y luego insertarlo con preparedStatement.setInt(1, dato) // o setString, setBoolean, setData
-		String sql = "Insert into usuario (idusuario, dni, apellido, nombre) " +
-			"VALUES " + "(null,'" + usuario.getDni() +  "','" + usuario.getApellido() + "','" +
-			usuario.getNombre() + "')";
+		String sql = "Insert into usuario (idusuario,  nombre, apellido, dni ) " +
+			"VALUES " + "(null,'" + usuario.getNombre() + "','" + 
+			usuario.getApellido() + "','" + usuario.getDni() + "')";
 		if (conexion.sqlUpdate(sql)) {
 			mensaje("Alta de usuario exitosa");
 			usuario.setIdusuario(conexion.getKeyGenerado()); //asigno el id generado
@@ -98,9 +98,9 @@ public class UsuarioData {
 	public boolean modificarUsuario(Usuario usuario){
 		String sql = 
 				"Update usuario set " + 
-				"dni='" + usuario.getDni() + "'," + 
-				"apellido='" + usuario.getApellido() + "'," +
-				"nombre='" + usuario.getNombre() + "'," +
+				"nombre='" + usuario.getNombre() + "', " +
+				"apellido='" + usuario.getApellido() + "', " +
+				"dni='" + usuario.getDni() + "' " + 
 				"where idusuario='" + usuario.getIdusuario() + "'";
 		if (conexion.sqlUpdate(sql)) {
 			mensaje("Modificación de usuario exitosa");
