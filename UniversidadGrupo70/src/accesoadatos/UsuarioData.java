@@ -260,7 +260,7 @@ public class UsuarioData {
 				usuario = resultSet2Usuario(rs);
 				conexion.cerrarSentencia();
 			} else
-				mensajeError("Error al obtener un usuario");
+				mensaje("Error al obtener un usuario");
 		} catch (SQLException ex) {
 			//Logger.getLogger(UsuarioData.class.getName()).log(Level.SEVERE, null, ex);
 			mensajeError("Error al obtener un Usuario " + ex.getMessage());
@@ -285,7 +285,7 @@ public class UsuarioData {
 				usuario = resultSet2Usuario(rs);
 				conexion.cerrarSentencia();
 			} else
-				mensajeError("Error al obtener un usuario");
+				mensaje("Error al obtener un usuario");
 		} catch (SQLException ex) {
 			//Logger.getLogger(UsuarioData.class.getName()).log(Level.SEVERE, null, ex);
 			mensajeError("Error al obtener un Usuario " + ex.getMessage());

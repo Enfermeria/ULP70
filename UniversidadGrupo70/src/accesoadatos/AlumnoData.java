@@ -331,7 +331,7 @@ public class AlumnoData {
 				alumno = resultSet2Alumno(rs);
 				conexion.cerrarSentencia();
 			} else
-				mensajeError("Error al obtener un alumno");
+				mensaje("Error al obtener un alumno");
 		} catch (SQLException ex) {
 			//Logger.getLogger(AlumnoData.class.getName()).log(Level.SEVERE, null, ex);
 			mensajeError("Error al obtener un Alumno " + ex.getMessage());
@@ -359,7 +359,7 @@ public class AlumnoData {
 				alumno = resultSet2Alumno(rs);
 				conexion.cerrarSentencia();
 			} else
-				mensajeError("Error al obtener un alumno");
+				mensaje("Error al obtener un alumno");
 		} catch (SQLException ex) {
 			//Logger.getLogger(AlumnoData.class.getName()).log(Level.SEVERE, null, ex);
 			mensajeError("Error al obtener un Alumno " + ex.getMessage());

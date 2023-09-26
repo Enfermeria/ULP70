@@ -355,7 +355,7 @@ public class InscripcionData {
 		//	"where i.idmateria = m.idmateria and i.idalumno=" + idalumno + ")";
 		String sql = 
 			"select m.idmateria, m.nombre, m.anio, m.estado from materia m " +
-			"where m.idmateria not in " +
+			"where m.idmateria not in " + // "where m.estado and m.idmateria not in " + 
 			"(select i.idmateria from inscripcion i where i.idalumno=" + idalumno + ")";
 		ResultSet rs = conexion.sqlSelect(sql);
 		try {

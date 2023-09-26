@@ -16,6 +16,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Date;
+import javax.swing.JOptionPane;
 
 /**
  *
@@ -27,7 +28,8 @@ public class Utils {
 	 * @param mensaje 
 	 */
 	public static void mensajeError(String mensaje){ 
-		System.out.println(mensaje);
+		//System.out.println(mensaje);
+		JOptionPane.showMessageDialog(null, mensaje);
 	} //mensajeError
 	
 	
