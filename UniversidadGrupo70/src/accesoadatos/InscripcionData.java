@@ -167,7 +167,8 @@ public class InscripcionData {
 		//Estoy presuponiendo que el alumno y materia que viene en la inscripcion YA ESTAN EN LA BD
 		String sql = 
 				"Update inscripcion set " + 
-				"nota='" + ((inscripcion.getNota()==0.0)?"null":inscripcion.getNota()) + "'," + 
+				//"nota='" + ((inscripcion.getNota()==0.0)?"null":inscripcion.getNota()) + "'," +
+				"nota=" + ((inscripcion.getNota()==0.0)?"null":"'"+inscripcion.getNota()+"'") + "," + 
 				"idalumno='" + inscripcion.getAlumno().getIdalumno()+ "'," +
 				"idmateria='" + inscripcion.getMateria().getIdmateria()+ "'" + " " +
 				"where idinscripcion='" + inscripcion.getIdinscripcion() + "'";

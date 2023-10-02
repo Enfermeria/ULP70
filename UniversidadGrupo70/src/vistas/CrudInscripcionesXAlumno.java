@@ -32,6 +32,7 @@ import entidades.Materia;
 import java.awt.Color;
 import java.time.LocalDate;
 import java.util.List;
+import javax.swing.CellEditor;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
@@ -116,6 +117,16 @@ public class CrudInscripcionesXAlumno extends javax.swing.JInternalFrame {
 	 * listaMateriasDisponibles a la tablaMateriasDisponibles
 	 */
 	private void cargarTablaMaterias(){
+		// Si estaba editando nota, que deje de hacerlo, cancelamos la edicion.
+		CellEditor cellEditor = tablaMateriasInscriptas.getCellEditor();
+		if (cellEditor != null) {
+			if (cellEditor.getCellEditorValue() != null) {
+				cellEditor.stopCellEditing();
+			} else {
+				cellEditor.cancelCellEditing();
+			}
+		}
+		
 		//borro las filas de la tablaMateriasInscriptas
 		for (int fila = modeloTablaMateriasInscriptas.getRowCount() -  1; fila >= 0; fila--)
 			modeloTablaMateriasInscriptas.removeRow(fila);

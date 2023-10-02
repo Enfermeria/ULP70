@@ -31,6 +31,7 @@ import entidades.Materia;
 import java.awt.Color;
 import java.time.LocalDate;
 import java.util.List;
+import javax.swing.CellEditor;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
@@ -113,6 +114,24 @@ public class CrudInscripcionesXMateria extends javax.swing.JInternalFrame {
 	 * listaAlumnosDisponibles a la tablaAlumnosDisponibles
 	 */
 	private void cargarTablaAlumnosInscriptosYDisponibles(){
+		//tablaAlumnosInscriptos.setEditingRow(-1); //si estaba editando que deje de hacerlo
+		//tablaAlumnosInscriptos.setEditingColumn(-1);
+		//tablaAlumnosInscriptos.changeSelection(tablaAlumnosInscriptos.getEditingRow(), tablaAlumnosInscriptos.getEditingColumn(), false, false);
+		//tablaAlumnosInscriptos.clearSelection();
+		//tablaAlumnosInscriptos.editCellAt(-1, -1);
+		//tablaAlumnosInscriptos.removeEditor();
+		
+		// Si estaba editando nota, que deje de hacerlo, cancelamos la edicion.
+		CellEditor cellEditor = tablaAlumnosInscriptos.getCellEditor();
+		if (cellEditor != null) {
+			if (cellEditor.getCellEditorValue() != null) {
+				cellEditor.stopCellEditing();
+			} else {
+				cellEditor.cancelCellEditing();
+			}
+		}
+		
+		
 		//borro las filas de la tablaAlumnosInscriptos
 		for (int fila = modeloTablaAlumnosInscriptos.getRowCount() -  1; fila >= 0; fila--)
 			modeloTablaAlumnosInscriptos.removeRow(fila);
@@ -310,6 +329,7 @@ public class CrudInscripcionesXMateria extends javax.swing.JInternalFrame {
 	 * @param numfila el número de fila a cargar a los campos
 	 */
 	private int filaTablaAlumnosInscriptos2IdInscripcion(int numfila){
+		System.out.println("en filaTablaAlumnosInscriptos2IdInscripcion numfila="+numfila); //debug
 		return (Integer)tablaAlumnosInscriptos.getValueAt(numfila, 0);			
 	} //filaTablaAlumnosInscriptos2IdInscripcion
 	
@@ -949,8 +969,10 @@ public class CrudInscripcionesXMateria extends javax.swing.JInternalFrame {
 			// System.out.println("ERROR... NO HAY FILA Editandose");
 			return;
         }
+		
         int numfilaInsc = tablaAlumnosInscriptos.getEditingRow();
         if (numfilaInsc != -1) { //si hay alguna fila editandose en la tabla de materias disponibles
+			System.out.println("en tablaAlumnosInscriptosPropertyChange numfilaInsc="+numfilaInsc); //debug
 			int idInscripcion = filaTablaAlumnosInscriptos2IdInscripcion(numfilaInsc);//averiguamos el idinscripcion
 			Inscripcion inscripcion = inscripcionData.getInscripcion(idInscripcion); // obtengo la inscripcion
 			double nota = filaTablaAlumnosInscriptos2Nota(numfilaInsc);
@@ -961,7 +983,7 @@ public class CrudInscripcionesXMateria extends javax.swing.JInternalFrame {
 				inscripcionData.modificarInscripcion(inscripcion);
 			}
 			//actualizamos las listas y tablas de materias
-			cargarListaAlumnos(inscripcion.getAlumno().getIdalumno());
+			cargarListaAlumnos(inscripcion.getMateria().getIdmateria());
 			cargarTablaAlumnosInscriptosYDisponibles();
 		}
     }//GEN-LAST:event_tablaAlumnosInscriptosPropertyChange
